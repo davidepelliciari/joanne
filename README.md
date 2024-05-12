@@ -128,7 +128,7 @@ Number of FRBs you want to inject. Each FRB will be a point-source lasting for a
 The characteristic flux density of each FRB is determined by the "fl_ch" parameter. The user can choose different ways to generate FRBs fluxes, via the ```modeFL```
 parameter. The implemented options are:
 
-- equal: all FRBs will have same flux = ``` fl_ch```;
+- equal: all FRBs will have same flux = ```fl_ch```;
 - random: FRBs will have flux randomly distributed around a ```fl_ch``` flux with a ```fl_std``` standard deviation;
 - powerlaw --> FRBs will have flux distributed as a power-law, with flux_min = ```fl_ch``` (i.e. the majority of bursts will have flux = ```fl_ch```), and a given
 power-law index alpha. alpha must be > 0, otherwise a change of sign will take place.
