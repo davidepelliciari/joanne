@@ -74,7 +74,7 @@ corruption:
     corrupt_table: mbd
 ```
 
-t's important to set the paths under "general" and the "base_calib" path under "calibration," where the calibration tables should be located.
+It's important to set the paths under "general" and the "base_calib" path under "calibration," where the calibration tables should be located.
 The configuration file must reside in the "./config/conf.yaml" directory. You can change this modifying manually the main python script, just after
 
 ```python
@@ -94,36 +94,17 @@ Permits to inject FRBs given an external file containing their time of arrivals 
 ```
 in case the file does not exists, the script will generate randomly selected ToAs inside the observational scans (taken from listobs file).
 
-```python
-EXPERIMENT
-```
-The name of the given experiment / test you want to make (e.g. ```EXPERIMENT: 5FRBs_10Jy, TEST, ...```). All the output results will
+- ```EXPERIMENT``` : the name of the given experiment / test you want to make (e.g. ```EXPERIMENT: 5FRBs_10Jy, TEST, ...```). All the output results will
 be placed at ```base+EXPERIMENT``` directory.
 
-```python
-antID
-```
-The ensamble of antennas used in your observation. You can find this from the listobs file, but you have to specify antID manually.
+- ```antID```: the ensamble of antennas used in your observation. You can find this from the listobs file, but you have to specify antID manually.
 
-```python
-modeIM_single
-modeIM_concat
-```
-select here if you want "DIRTY" or "CLEANED" images for individual splitted MS files. The same for the following parameters, but for the combined image.
+```modeIM_single, modeIM_concat```: select here if you want "DIRTY" or "CLEANED" images for individual splitted MS files. The same for the following parameters, but for the combined image.
 
-```python
-box_region
-rms
-```
-The pixel coordinates of a rectangular box inside which a gaussian fit will be performed after the cleaning of the combined image. ```rms``` defines
+```box_region, rms```: the pixel coordinates of a rectangular box inside which a gaussian fit will be performed after the cleaning of the combined image. ```rms``` defines
 the flux threshold at which the global cleaning (CASA's ```tclean``` task) will stop.
 
-```python
-nFRBs
-fl_ch
-modeFL
-```
-Number of FRBs you want to inject. Each FRB will be a point-source lasting for a single integration time (the minimum possible duration).
+```nFRBs, fl_ch, modeFL```: number of FRBs you want to inject. Each FRB will be a point-source lasting for a single integration time (the minimum possible duration).
 
 The characteristic flux density of each FRB is determined by the "fl_ch" parameter. The user can choose different ways to generate FRBs fluxes, via the ```modeFL```
 parameter. The implemented options are:
@@ -134,25 +115,13 @@ parameter. The implemented options are:
 power-law index alpha. alpha must be > 0, otherwise a change of sign will take place.
 
 The time of arrival of each FRB can be read from an external file, otherwise will be generated randomly inside a given scan from the main script.
-You can choose the different ToA simulation modes via
-
-```python
-mode_inj
-```
-parameter. The implemented options are:
+You can choose the different ToA simulation modes via the ```mode_inj``` parameter. The implemented options are:
 - from_file: read ToAs from external file. See above.
 - uniform: the scans in which a given FRB will be injected is drawn randomly from the ensamble of scans of the given ```fld_inj``` field.
 - heavenly: as "uniform", but the first and the last scan will contain an FRB.
 
-```python
-do_corrupt
-ant_not_used
-corr_ant
-corruption
-corrupt_table
-```
-Determine the visibility corruption modality. The user can choose wheter to corrupt or not with ```do_corrupt``` parameter. 
-If this parameter is set to True, then the other parameters will be effective. ```ant_not_used``` defined the antennas you want to
+```do_corrupt, ant_not_used, corr_ant, corruption, corrupt_table```: determine the visibility corruption modality. The user can choose wheter
+to corrupt or not with ```do_corrupt``` parameter. If this parameter is set to True, then the other parameters will be effective. ```ant_not_used``` defined the antennas you want to
 remove from the ```antID``` ensamble. NB: the same antenna must have been removed in the calibration steps used for obtaining the calibration
 tables at ```base_calib``` path. If you specify ```ant_not_used: All```, all the antennas will be considered. 
 ```corr_ant``` defines the antenna in which you want to inject a phase offset (i.e. the antenna of which calibration solution you want to corrupt).
