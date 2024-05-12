@@ -994,7 +994,7 @@ if __name__ == "__main__":
             default(flagdata)
             flagdata(mode='rflag', vis=outms, field=fld_INJ, antenna=antennae, datacolumn='corrected', flagbackup=False, timedevscale=5.0, freqdevscale=5.0)
 
-            #getIMAGE(outms, antennae, outms[:-3]+'_bkg', 'DIRTY')         ## if you want to look at the image pre-injection
+            #(outms, antennae, outms[:-3]+'_bkg', 'DIRTY')         ## if you want to look at the image pre-injection
             #rms = imstat(imagename=outms[:-3]+'_bkg.image', box='53, 892, 1232, 1250')['rms'][0]
 
             #print("## Injected burst ", outms, " rms of DIRTY image (pre-injection): ", rms)
@@ -1026,7 +1026,7 @@ if __name__ == "__main__":
 
                 print("## Corrupting visibilities.. corruption: ", corruption, " deg")
                 corruptVIS(outms, corruption, thetable, corr_table, antID, mask, base_calib)
-                #getIMAGE(outms, antennae, imout)      ## get the DIRTY image of your injected-corrupted visibilities
+                #getIMAGE(outms, antennae, imout, modeIM_single, imsize)      ## get the DIRTY image of your injected-corrupted visibilities
                 print("## Done!")
 
             else:
@@ -1034,7 +1034,7 @@ if __name__ == "__main__":
                 imout = outms[:-3]+"_"+modeIM_single
                 default(uvsub)
                 uvsub(vis=outms, reverse=True)
-                #getIMAGE(outms, antennae, imout, modeIM)
+                #getIMAGE(outms, antennae, imout, modeIM_single, imsize)
 
     mystep = 4
 
@@ -1053,7 +1053,7 @@ if __name__ == "__main__":
         print("## ready for tclean..")
         imout = outDIR_INJ+"CONCAT_"+str(nFRBs)+"FRB_"+deltaT+"_"+modeIM_concat
         fitlog_file = outDIR_INJ+"imfit_logger.log"
-        getIMAGE(concat_vis, antennae, imout, modeIM_concat, rms)      ## get the DIRTY image of your injected-corrupted visibilities
+        getIMAGE(concat_vis, antennae, imout, modeIM_concat, imsize, rms)      ## get the DIRTY image of your injected-corrupted visibilities
         RAfit, decfit = extractFIT(imout+".image", box_region, fitlog_file)
 
         print("## writing fit to file: ", outputFIT_path)
