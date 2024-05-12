@@ -83,7 +83,7 @@ if __name__ == "__main__":
 
 ### Description of configuration file parameters
 
-```file_ToAs```: this parameter permits to inject FRBs given an external file containing their time of arrivals (ToAs). The ToA format should be:
+- ```file_ToAs```: this parameter permits to inject FRBs given an external file containing their time of arrivals (ToAs). The ToA format should be:
 
 ```python
 2022/09/22/00:11:39
