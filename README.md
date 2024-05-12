@@ -99,12 +99,12 @@ be placed at ```base+EXPERIMENT``` directory.
 
 - ```antID```: the ensamble of antennas used in your observation. You can find this from the listobs file, but you have to specify antID manually.
 
-```modeIM_single, modeIM_concat```: select here if you want "DIRTY" or "CLEANED" images for individual splitted MS files. The same for the following parameters, but for the combined image.
+- ```modeIM_single, modeIM_concat```: select here if you want "DIRTY" or "CLEANED" images for individual splitted MS files. The same for the following parameters, but for the combined image.
 
-```box_region, rms```: the pixel coordinates of a rectangular box inside which a gaussian fit will be performed after the cleaning of the combined image. ```rms``` defines
+- ```box_region, rms```: the pixel coordinates of a rectangular box inside which a gaussian fit will be performed after the cleaning of the combined image. ```rms``` defines
 the flux threshold at which the global cleaning (CASA's ```tclean``` task) will stop.
 
-```nFRBs, fl_ch, modeFL```: number of FRBs you want to inject. Each FRB will be a point-source lasting for a single integration time (the minimum possible duration).
+- ```nFRBs, fl_ch, modeFL```: number of FRBs you want to inject. Each FRB will be a point-source lasting for a single integration time (the minimum possible duration).
 
 The characteristic flux density of each FRB is determined by the "fl_ch" parameter. The user can choose different ways to generate FRBs fluxes, via the ```modeFL```
 parameter. The implemented options are:
