@@ -97,7 +97,8 @@ in case the file does not exists, the script will generate randomly selected ToA
 ```python
 EXPERIMENT
 ```
-The name of the given experiment / test you want to make (e.g. ```python EXPERIMENT: 5FRBs_10Jy, TEST, ...```).
+The name of the given experiment / test you want to make (e.g. ```python EXPERIMENT: 5FRBs_10Jy, TEST, ...```). All the output results will
+be placed at ```python base+EXPERIMENT ``` directory.
 
 ```python
 antID
