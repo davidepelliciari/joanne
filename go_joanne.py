@@ -758,10 +758,10 @@ if __name__ == "__main__":
     ########## visibilities
 
     # general parameters
-    base = general_params[0]
-    listobs_path = general_params[1]
-    file_ToAs = general_params[2]
-    EXPERIMENT = general_params[3]
+    listobs_path = general_params[0]
+    file_ToAs = general_params[1]
+    EXPERIMENT = general_params[2]
+    output_path = general_params[3]
 
     # calibration parameters
     uvfile = calibration_params[0]
@@ -808,11 +808,10 @@ if __name__ == "__main__":
     corruption = corruption_params[3]
     corrupt_table = base_calib+corruption_params[4]
 
-    base_EXP = base+EXPERIMENT+"/"
+    base_EXP = output_path+EXPERIMENT+"/"
     outputFIT_path = base_EXP+EXPERIMENT+"_FITlog.txt"
-    targetFLAG = base+'FLAGtarget.flagcmd'
 
-    newlistobs_path = base+'skimmedListobs.dat'
+    newlistobs_path = output_path+'skimmedListobs.dat'
 
     flux, str_fl = get_fluxes(nFRBs, modeFL, fl_ch, fl_std, alpha_fl)
     str_fl = str_fl+str(fl_ch)
@@ -936,7 +935,7 @@ if __name__ == "__main__":
 
         else:
             print("## No LISTOBS path set. Creating it..")
-            listobs_path = base+obsid+".listobs"
+            listobs_path = output_path+expcode+".listobs"
             listobs(vis=ms, listfile=listobs_path)
     
         if outDIR_INJ is not None and os.path.exists(outDIR_INJ):
@@ -960,7 +959,7 @@ if __name__ == "__main__":
 
         for ii in range(0,len(sel_toas)):
 
-            outms = outDIR_INJ+obsid+"_INJ_"+str(ii)+".ms"
+            outms = outDIR_INJ+expcode+"_INJ_"+str(ii)+".ms"
             toa = parse_datetime(sel_toas[ii])
 
             start_split_DT = toa - timedelta(seconds=0.5)
@@ -1018,8 +1017,6 @@ if __name__ == "__main__":
             out_name = im_name+".cl"
         
             modelPointSource(outms, fl, direction, freq, BW, cell, radir, decdir, im_name, out_name)
-            #imout = base+"splittedMS/"+obsid+"_"+ANT_notUSED_dir     # final DIRTY image name
-            #image_idealFake(outms, antennae, imout)
 
             # if no corruption has to be applied then you want only to inject the point source into CORRECTED_DATA column
             if doCorrupt:
