@@ -1,8 +1,8 @@
 general:
-	base: /path/to/base_path/
 	listobs_path: null
 	file_ToAs: /path/to/timeofarrivals.dat
 	EXPERIMENT: TEST
+	output_path: /path/to/base_path/
 
 calibration:
 	uvfile: /path/to/uvfits_file/.uvfits
