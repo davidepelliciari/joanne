@@ -7,8 +7,10 @@ If you have a UVFITS file available, running the main script from step "0" will 
 
 Once inside the CASA environment
 
+```python
 mysteps=[0,1,2,3,4,5]
 execfile('VLBI_FRB_injection.py')
+```
 
 All parameters needed for the correct usage of the script are contained in the configuration file located in the directory "./config/conf.yaml". These parameters are extracted from the main script using the Python package yaml.
 
