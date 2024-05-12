@@ -14,6 +14,7 @@ All parameters needed for the correct usage of the script are contained in the c
 
 A sample calibration script looks like this:
 
+```python
 general:
     base: /path/to/base_path/
     listobs_path: /path/to/listobs/.listobs
@@ -63,6 +64,6 @@ corruption:
     corr_ant: O8
     corruption: 1.0
     corrupt_table: mbd
-
+```
 
 t's important to set the paths under "general" and the "base_calib" path under "calibration," where the calibration tables should be located.
