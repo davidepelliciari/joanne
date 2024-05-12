@@ -1,0 +1,51 @@
+general:
+	base: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/
+	listobs_path: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/ek051e.listobs
+	file_ToAs: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/R1_listobs.dat
+	EXPERIMENT: test1.1
+
+calibration:
+	uvfile: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/ek051e.uvfits
+	ms: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/ek051e.ms
+	base_calib: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/
+	targetFLAG: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/FLAGtarget.flagcmd
+	bp_cal: J1829+4844
+	ph_cal: J0529+3209
+	target: R1_D
+	sbdtab: ek051e.sbd
+	mbdtab: ek051e.mbd
+	bpasstab: ek051e.bpass
+	Kselftab: J0529+3209_self.K
+	pselftab: J0529+3209_self.p
+	apselftab: J0529+3209_self.ap
+	antID: EF,TR,WB,NT,O8,CM,DA,DU,KN,PI,DE,JM,MC
+
+imaging:
+	modeIM_single: DIRTY
+	modeIM_concat: CLEAN
+	imsize: 1280
+	box_region: 626,626,654,654
+	rms: 2.e-4
+	
+injection:
+	nFRBs: 15
+	fl_ch: 0.01
+	fl_std: 0.025
+	alpha_fl: -2
+	modeFL: equal
+	freq: 1.4GHz
+	BW: 0.256GHz
+	direction: J2000 05h31m58.700s +33d08m52.568s
+	cell: 3.6mas
+	t_start_inj: 2022/09/22/00:00:00
+	t_stop_inj: 2022/09/22/05:48:39
+	fld_inj: R1_D
+	mode_inj: uniform
+
+corruption:
+	ant_not_used: All
+	corr_ant: O8
+	corruption: 1.0
+	corrupt_table: mbd
+
+
