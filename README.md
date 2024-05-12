@@ -1,9 +1,14 @@
 # VLBI-FRB-injection
 
-This script enables the injection of a given number of Fast Radio Bursts (FRBs) into radio interferometric visibility data. Additionally, if specific calibration tables are already present, it allows simulating systematic phase errors by corrupting the phases of one or more antennas, injecting a phase offset (only the parameter phi_0_c of the multi-band delay table for now) at one or more antennas.
+This script enables the injection of a given number of Fast Radio Bursts (FRBs) into radio interferometric visibility data.
+Additionally, if specific calibration tables are already present, it allows simulating systematic phase errors by corrupting the phases of one or more antennas,
+injecting a phase offset (only the parameter phi_0_c of the multi-band delay table for now) at one or more antennas. The script will split a CASA's MEASUREMENT SET (MS)
+file into NFRBs MS files, of 1 second duration each around their time of arrivals (ToAs). Then, these splitted MS files will be combined via CASA's concat task.
+A final dirty/cleaned image is created for the combined dataset, and the user can choose also to get single dirty images from each splitted visibilities.
 
 ## Usage:
-If you have a UVFITS file available, running the main script from step "0" will convert it into a MEASUREMENT SET. You can skip this step by starting from step "1" if you already have a MEASUREMENT SET file.
+If you have a UVFITS file available, running the main script from step "0" will convert it into a MEASUREMENT SET.
+You can skip this step by starting from step "1" if you already have a MEASUREMENT SET file.
 
 Once inside the CASA environment
 
@@ -12,7 +17,8 @@ mysteps=[0,1,2,3,4,5]
 execfile('VLBI_FRB_injection.py')
 ```
 
-All parameters needed for the correct usage of the script are contained in the configuration file located in the directory "./config/conf.yaml". These parameters are extracted from the main script using the Python package yaml.
+All parameters needed for the correct usage of the script are contained in the configuration file located in the directory "./config/conf.yaml".
+These parameters are extracted from the main script using the Python package yaml.
 
 A sample calibration script looks like this:
 
@@ -69,3 +75,78 @@ corruption:
 ```
 
 t's important to set the paths under "general" and the "base_calib" path under "calibration," where the calibration tables should be located.
+The configuration file must reside in the "./config/conf.yaml" directory. You can change this modifying manually the main python script, just after
+
+```python
+if __name__ == "__main__":
+```
+
+### Description of configuration file parameters
+
+```python
+file_ToAs
+```
+Permits to inject FRBs given an external file containing their time of arrivals (ToAs). The ToA format should be:
+```python
+2022/09/22/00:11:39
+2022/09/22/00:28:51
+...
+```
+in case the file does not exists, the script will generate randomly selected ToAs inside the observational scans (taken from listobs file).
+
+```python
+EXPERIMENT
+```
+The name of the given experiment / test you want to make (e.g. EXPERIMENT: 5FRBs_10Jy, TEST, ...).
+
+```python
+antID
+```
+The ensamble of antennas used in your observation. You can find this from the listobs file, but you have to specify antID manually.
+
+```python
+modeIM_single
+modeIM_concat
+```
+select here if you want "DIRTY" or "CLEANED" images for individual splitted MS files. The same for the following parameters, but for the combined image.
+
+```python
+box_region
+rms
+```
+The pixel coordinates of a rectangular box inside which a gaussian fit will be performed after the cleaning of the combined image. "rms" defined the flux threshold
+at which the global cleaning (CASA's tclean task) will stop.
+
+```python
+nFRBs
+fl_ch
+modeFL
+```
+Number of FRBs you want to inject. Each FRB will be a point-source lasting for a single integration time (the minimum possible duration).
+
+The characteristic flux density of each FRB is determined by the "fl_ch" parameter. The user can choose different ways to generate FRBs fluxes, via the "modeFL"
+parameter. The implemented options are:
+
+- equal: all FRBs will have same flux = fl_ch;
+- random: FRBs will have flux randomly distributed around a fl_ch flux with a fl_std standard deviation;
+- powerlaw --> FRBs will have flux distributed as a power-law, with flux_min = fl_ch (i.e. the majority of bursts will have flux = fl_ch), and a given
+power-law index alpha. alpha must be > 0, otherwise a change of sign will take place.
+
+The time of arrival of each FRB can be read from an external file, otherwise will be generated randomly inside a given scan from the main script.
+You can choose the different ToA simulation modes via
+
+```python
+mode_inj
+```
+parameter. The implemented options are:
+- from_file: read ToAs from external file. See above.
+- uniform: the scans in which a given FRB will be injected is drawn randomly from the ensamble of scans of the given "fld_inj" field.
+- heavenly: as "uniform", but the first and the last scan will contain an FRB.
+
+```python
+ant_not_used
+corr_ant
+corruption
+corrupt_table
+```
+Select w
