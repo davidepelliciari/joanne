@@ -771,12 +771,12 @@ if __name__ == "__main__":
     bp_cal = calibration_params[4]
     ph_cal = calibration_params[5]
     target = calibration_params[6]
-    sbdtab = calibration_params[7]
-    mbdtab = calibration_params[8]
-    bpasstab = calibration_params[9]
-    Kselftab = calibration_params[10]
-    pselftab = calibration_params[11]
-    apselftab = calibration_params[12]
+    sbdtab = base_calib+calibration_params[7]
+    mbdtab = base_calib+calibration_params[8]
+    bpasstab = base_calib+calibration_params[9]
+    Kselftab = base_calib+calibration_params[10]
+    pselftab = base_calib+calibration_params[11]
+    apselftab = base_calib+calibration_params[12]
     antID = calibration_params[13]
 
     # imaging parameters
@@ -806,7 +806,7 @@ if __name__ == "__main__":
     ant_not_used = corruption_params[1]
     corr_ant = corruption_params[2]
     corruption = corruption_params[3]
-    corr_table = corruption_params[4]
+    corrupt_table = base_calib+corruption_params[4]
 
     base_EXP = base+EXPERIMENT+"/"
     outputFIT_path = base_EXP+EXPERIMENT+"_FITlog.txt"
@@ -863,8 +863,10 @@ if __name__ == "__main__":
         antennae = '*&*'
         ANT_notUSED_dir = 'None'
 
-    
-    corr_table = base_calib+"corruptedTab"+corr_ant
+
+    thetable = base_calib+corrupt_table
+    expcode, corr_ant = corrupt_table.split(".")
+    corr_table = base_calib+expcode+"_inj"+corr_ant
 
     print("## The corrupted table (copy of it) will be: ")
     print(corr_table)
