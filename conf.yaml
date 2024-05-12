@@ -1,14 +1,14 @@
 general:
-	base: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/
-	listobs_path: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/ek051e.listobs
-	file_ToAs: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/R1_listobs.dat
+	base: /path/to/base_path/
+	listobs_path: /path/to/listobs/.listobs
+	file_ToAs: /path/to/timeofarrivals.dat
 	EXPERIMENT: test1.1
 
 calibration:
-	uvfile: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/ek051e.uvfits
-	ms: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/ek051e.ms
-	base_calib: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/
-	targetFLAG: /home/davide/CASA/casa-6.4.0-16/EVN/test/MetodoKirsten/FLAGtarget.flagcmd
+	uvfile: /path/to/uvfits_file/.uvfits
+	ms: /path/to/msfile/.ms
+	base_calib: /path/to/calib_folder/
+	targetFLAG: /path/to/flags/FLAGtarget.flagcmd
 	bp_cal: J1829+4844
 	ph_cal: J0529+3209
 	target: R1_D
