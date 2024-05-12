@@ -1,8 +1,8 @@
 general:
 	base: /path/to/base_path/
-	listobs_path: /path/to/listobs/.listobs
+	listobs_path: null
 	file_ToAs: /path/to/timeofarrivals.dat
-	EXPERIMENT: test1.1
+	EXPERIMENT: TEST
 
 calibration:
 	uvfile: /path/to/uvfits_file/.uvfits
@@ -12,12 +12,12 @@ calibration:
 	bp_cal: J1829+4844
 	ph_cal: J0529+3209
 	target: R1_D
-	sbdtab: ek051e.sbd
-	mbdtab: ek051e.mbd
-	bpasstab: ek051e.bpass
-	Kselftab: J0529+3209_self.K
-	pselftab: J0529+3209_self.p
-	apselftab: J0529+3209_self.ap
+	sbdtab: expCODE.sbd
+	mbdtab: expCODE.mbd
+	bpasstab: expCODE.bpass
+	Kselftab: null
+	pselftab: null
+	apselftab: null
 	antID: EF,TR,WB,NT,O8,CM,DA,DU,KN,PI,DE,JM,MC
 
 imaging:
@@ -44,7 +44,7 @@ injection:
 
 corruption:
 	do_corrupt: False
-	ant_not_used: All
+	ant_not_used: None
 	corr_ant: O8
 	corruption: 1.0
 	corrupt_table: mbd
