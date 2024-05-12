@@ -166,5 +166,5 @@ The corruption will take place in the ```phi_0_c``` parameter of the mbd table.
 numpy, matplotlib, scipy, math, random, re, yaml, os, casatools, casavlbitools, datetime, 
 ```
 
-For any questions regarding the VLBI-FRB-injection pipeline please feel free to write to:
+For any questions regarding the pipeline please feel free to write to:
 davide.pellciari@inaf.it
