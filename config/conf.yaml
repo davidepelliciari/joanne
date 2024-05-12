@@ -43,6 +43,7 @@ injection:
 	mode_inj: uniform
 
 corruption:
+	do_corrupt: False
 	ant_not_used: All
 	corr_ant: O8
 	corruption: 1.0
