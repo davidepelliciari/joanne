@@ -159,5 +159,11 @@ tables at ```python base_calib ``` path. If you specify ```python ant_not_used: 
 ```python corrupt_table``` defines the type of calibration table in which the corruption will take place. For now only ```python corrupt_table: mbd ``` (mbd = multi-band delay) is implemented.
 The corruption will take place in the ```python phi_0_c ``` parameter of the mbd table.
 
+## Dependencies
+
+```python
+numpy, matplotlib, scipy, math, random, re, yaml, os, casatools, casavlbitools, datetime, 
+```
+
 For any questions regarding the VLBI-FRB-injection pipeline please feel free to write to:
 davide.pellciari@inaf.it
