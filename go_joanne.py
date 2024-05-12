@@ -627,8 +627,6 @@ def getAntennae(ANT_notUSED):
     ANT_notUSED_dir, ant_notUSED = getANT(ANT_notUSED)
     if ANT_notUSED == ['eMer']:
         ANT_notUSED = ["CM","DA","DU","KN","PI","DE","JM"]
-    elif ANT_notUSED == ['All'] or ANT_notUSED == ['None']:
-        antennae = '*&*'
     elif ANT_notUSED == ['None']:
         print("## No antenna selected! Changing ant to *&* (all)")
         antennae = '*&*'
@@ -833,7 +831,7 @@ if __name__ == "__main__":
     ANT_notUSED = [ant_not_used]        ## specify which antenna has not been used for applycal
 
     selANT = False
-    if ANT_notUSED != ['All']:
+    if ANT_notUSED != ['None']:
         selANT = True
 
     corrANT = [corr_ant]
@@ -863,11 +861,12 @@ if __name__ == "__main__":
         print(base_calib+" is not an existing, non empty directory!")
         print("Using all antennas instead, i.e. using calibration from All")
         antennae = '*&*'
-        ANT_notUSED_dir = 'All'
+        ANT_notUSED_dir = 'None'
 
+    
     corr_table = base_calib+"corruptedTab"+corr_ant
 
-    print(".. the corrupted table (copy of it) will be: ")
+    print("## The corrupted table (copy of it) will be: ")
     print(corr_table)
 
     ######################################################################
@@ -884,16 +883,16 @@ if __name__ == "__main__":
     thesteps = []
 
     try:
-        print('List of steps to be executed: ', mysteps)
+        print('## List of steps to be executed: ', mysteps)
         thesteps = mysteps
 
     except:
-        print('Global variable mystep not set')
+        print('## Global variable mystep not set')
 
     if(thesteps==[]):
 
         thesteps = range(0,len(step_title))
-        print('Executing all steps: ', thesteps)
+        print('## Executing all steps: ', thesteps)
 
 
     ## Import UVFITS in MS
@@ -905,8 +904,8 @@ if __name__ == "__main__":
         #print("rm -rf "+ms+"*")
         #os.system('rm -rf '+ms+"*")
     
-        print("## Importing from .."+uvfile)
-        print("## MS file will be: "+ms)
+        print("## Importing from .. "+uvfile)
+        print("## MS file will be .. : "+ms)
 
         default(importuvfits)
         importuvfits(fitsfile=uvfile, vis=ms)
@@ -931,10 +930,10 @@ if __name__ == "__main__":
     if(mystep in thesteps):
 
         if listobs_path is not None and os.path.exists(listobs_path):
-            print("## Considering LISTOBS: ", listobs_path)
+            print("## Considering listobs file.. ", listobs_path)
 
         else:
-            print("## No LISTOBS path set! Creating it")
+            print("## No LISTOBS path set. Creating it..")
             listobs_path = base+obsid+".listobs"
             listobs(vis=ms, listfile=listobs_path)
     
@@ -948,8 +947,6 @@ if __name__ == "__main__":
 
             skim_listobs(listobs_path, newlistobs_path)
             scan_data = get_scans(newlistobs_path, fld_INJ)
-            print("scan data R1:")
-            print(scan_data)
             sel_toas = get_injected_times(outDIR_INJ, scan_data, nFRBs, modeINJ, t_start_INJ, t_stop_INJ)
 
         else:
@@ -970,7 +967,7 @@ if __name__ == "__main__":
             stop_split = stop_split_DT.strftime('%Y/%m/%d/%H:%M:%S.%f')
             timerange = start_split+"~"+stop_split
 
-            print("timerange: ", timerange)
+            print("## Timerange: ", timerange)
             default(split)
             split(vis=ms, outputvis=outms, field=fld_INJ, datacolumn='data', timerange=timerange)
 
