@@ -750,7 +750,10 @@ def extractFIT(im_name, box_region, logFILE):
 
 if __name__ == "__main__":
 
-    config_file = sys.argv[1]
+    if len(sys.argv) > 1:
+        config_file = sys.argv[1]
+    else:
+        config_file = os.getcwd()+"/config/conf.yaml"
 
     general_params, calibration_params, imaging_params, injection_params, corruption_params = read_config(config_file)
 
