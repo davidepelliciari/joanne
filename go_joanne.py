@@ -902,8 +902,8 @@ if __name__ == "__main__":
 
     if(mystep in thesteps):
 
-        print("rm -rf "+ms+"*")
-        os.system('rm -rf '+ms+"*")
+        #print("rm -rf "+ms+"*")
+        #os.system('rm -rf '+ms+"*")
     
         print("## Importing from .."+uvfile)
         print("## MS file will be: "+ms)
