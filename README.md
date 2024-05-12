@@ -14,7 +14,7 @@ Once inside the CASA environment
 
 ```python
 mysteps=[0,1,2,3,4,5]
-execfile('VLBI_FRB_injection.py')
+execfile('go_joanne.py')
 ```
 
 All parameters needed for the correct usage of the script are contained in the configuration file located in the directory "./config/conf.yaml".
