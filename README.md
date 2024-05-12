@@ -107,7 +107,7 @@ the flux threshold at which the global cleaning (CASA's ```tclean``` task) will 
 The characteristic flux density of each FRB is determined by the "fl_ch" parameter. The user can choose different ways to generate FRBs fluxes, via the ```modeFL```
 parameter. The implemented options are:
 
-- equal: all FRBs will have same flux = ```fl_ch```;
+- equal: all FRBs will have same flux = ```fl_ch``` (units of Jy/beam);
 - random: FRBs will have flux randomly distributed around a ```fl_ch``` flux with a ```fl_std``` standard deviation;
 - powerlaw --> FRBs will have flux distributed as a power-law, with flux_min = ```fl_ch``` (i.e. the majority of bursts will have flux = ```fl_ch```), and a given
 power-law index alpha. alpha must be > 0, otherwise a change of sign will take place.
