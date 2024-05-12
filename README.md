@@ -1,6 +1,6 @@
-# JOANNE: inJection-corruptiOn of fAst radio bursts iNto iNterferometric visibilitiEs
+# JOANNE: An injection pipeline of FRB-like signals into real interferometric data
 
-This python-3 script enables the injection of a given number of Fast Radio Bursts (FRBs) into radio interferometric visibility data.
+JOANNE,  inJection-cOrruption of fAst radio bursts iNto iNterferometric visibilitiEs, is a python-3 script which enables the injection of a given number of Fast Radio Bursts (FRBs) into radio interferometric visibility data.
 Additionally, if specific calibration tables are already present, it allows simulating systematic phase errors by corrupting the phases of one or more antennas,
 injecting a phase offset (only the parameter phi_0_c of the multi-band delay table for now) at one or more antennas. The script will split a CASA's MEASUREMENT SET (MS)
 file into NFRBs MS files, of 1 second duration each around their time of arrivals (ToAs). Then, these splitted MS files will be combined via CASA's concat task.
