@@ -119,7 +119,7 @@ You can choose the different ToA simulation modes via the ```mode_inj``` paramet
 - heavenly: as "uniform", but the first and the last scan will contain an FRB.
 
 - ```do_corrupt, ant_not_used```: determine the visibility corruption modality. The user can choose wheter
-to corrupt or not with ```do_corrupt``` parameter. If this parameter is set to True, then the other parameters will be effective. ```ant_not_used``` defines the antennas you want to
+to corrupt or not with ```do_corrupt``` parameter. If this parameter is set to ```True```, then the other parameters will be effective. ```ant_not_used``` defines the antennas you want to
 remove from the ```antID``` ensamble. NB: the same antenna must have been removed in the calibration steps used for obtaining the calibration
 tables at ```base_calib``` path. If you specify ```ant_not_used: All```, all the antennas will be considered.
 
