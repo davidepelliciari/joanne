@@ -97,8 +97,8 @@ in case the file does not exists, the script will generate randomly selected ToA
 ```python
 EXPERIMENT
 ```
-The name of the given experiment / test you want to make (e.g. ```python EXPERIMENT: 5FRBs_10Jy, TEST, ...```). All the output results will
-be placed at ```python base+EXPERIMENT ``` directory.
+The name of the given experiment / test you want to make (e.g. ``` EXPERIMENT: 5FRBs_10Jy, TEST, ...```). All the output results will
+be placed at ``` base+EXPERIMENT ``` directory.
 
 ```python
 antID
@@ -115,8 +115,8 @@ select here if you want "DIRTY" or "CLEANED" images for individual splitted MS f
 box_region
 rms
 ```
-The pixel coordinates of a rectangular box inside which a gaussian fit will be performed after the cleaning of the combined image. ```python rms ``` defines
-the flux threshold at which the global cleaning (CASA's ```python tclean ``` task) will stop.
+The pixel coordinates of a rectangular box inside which a gaussian fit will be performed after the cleaning of the combined image. ``` rms ``` defines
+the flux threshold at which the global cleaning (CASA's ``` tclean ``` task) will stop.
 
 ```python
 nFRBs
@@ -125,12 +125,12 @@ modeFL
 ```
 Number of FRBs you want to inject. Each FRB will be a point-source lasting for a single integration time (the minimum possible duration).
 
-The characteristic flux density of each FRB is determined by the "fl_ch" parameter. The user can choose different ways to generate FRBs fluxes, via the ```python modeFL ```
+The characteristic flux density of each FRB is determined by the "fl_ch" parameter. The user can choose different ways to generate FRBs fluxes, via the ``` modeFL ```
 parameter. The implemented options are:
 
-- equal: all FRBs will have same flux = ``` python fl_ch ```;
-- random: FRBs will have flux randomly distributed around a ```python fl_ch``` flux with a ```python fl_std ``` standard deviation;
-- powerlaw --> FRBs will have flux distributed as a power-law, with flux_min = ```python fl_ch ``` (i.e. the majority of bursts will have flux = ```python fl_ch ```), and a given
+- equal: all FRBs will have same flux = ```  fl_ch ```;
+- random: FRBs will have flux randomly distributed around a ``` fl_ch``` flux with a ``` fl_std ``` standard deviation;
+- powerlaw --> FRBs will have flux distributed as a power-law, with flux_min = ``` fl_ch ``` (i.e. the majority of bursts will have flux = ``` fl_ch ```), and a given
 power-law index alpha. alpha must be > 0, otherwise a change of sign will take place.
 
 The time of arrival of each FRB can be read from an external file, otherwise will be generated randomly inside a given scan from the main script.
@@ -141,7 +141,7 @@ mode_inj
 ```
 parameter. The implemented options are:
 - from_file: read ToAs from external file. See above.
-- uniform: the scans in which a given FRB will be injected is drawn randomly from the ensamble of scans of the given ```python fld_inj``` field.
+- uniform: the scans in which a given FRB will be injected is drawn randomly from the ensamble of scans of the given ``` fld_inj``` field.
 - heavenly: as "uniform", but the first and the last scan will contain an FRB.
 
 ```python
@@ -151,14 +151,14 @@ corr_ant
 corruption
 corrupt_table
 ```
-Determine the visibility corruption modality. The user can choose wheter to corrupt or not with ```python do_corrupt"``` parameter. 
-If this parameter is set to True, then the other parameters will be effective. ```python ant_not_used ``` defined the antennas you want to
-remove from the ```python antID ``` ensamble. NB: the same antenna must have been removed in the calibration steps used for obtaining the calibration
-tables at ```python base_calib ``` path. If you specify ```python ant_not_used: All ```, all the antennas will be considered. 
-```python corr_ant ``` defines the antenna in which you want to inject a phase offset (i.e. the antenna of which calibration solution you want to corrupt).
-```python corrupt ``` defines the amount of corruption (in units of deg) to inject in a given ```corr_ant ``` antenna's phase solution.
-```python corrupt_table``` defines the type of calibration table in which the corruption will take place. For now only ```python corrupt_table: mbd ``` (mbd = multi-band delay) is implemented.
-The corruption will take place in the ```python phi_0_c ``` parameter of the mbd table.
+Determine the visibility corruption modality. The user can choose wheter to corrupt or not with ``` do_corrupt"``` parameter. 
+If this parameter is set to True, then the other parameters will be effective. ``` ant_not_used ``` defined the antennas you want to
+remove from the ``` antID ``` ensamble. NB: the same antenna must have been removed in the calibration steps used for obtaining the calibration
+tables at ``` base_calib ``` path. If you specify ``` ant_not_used: All ```, all the antennas will be considered. 
+``` corr_ant ``` defines the antenna in which you want to inject a phase offset (i.e. the antenna of which calibration solution you want to corrupt).
+``` corrupt ``` defines the amount of corruption (in units of deg) to inject in a given ```corr_ant ``` antenna's phase solution.
+``` corrupt_table``` defines the type of calibration table in which the corruption will take place. For now only ``` corrupt_table: mbd ``` (mbd = multi-band delay) is implemented.
+The corruption will take place in the ``` phi_0_c ``` parameter of the mbd table.
 
 ## Dependencies
 
