@@ -104,7 +104,7 @@ the flux threshold at which the global cleaning (CASA's ```tclean``` task) will 
 
 - ```nFRBs, fl_ch, modeFL```: number of FRBs you want to inject. Each FRB will be a point-source lasting for a single integration time (the minimum possible duration).
 
-The characteristic flux density of each FRB is determined by the "fl_ch" parameter. The user can choose different ways to generate FRBs fluxes, via the ```modeFL```
+The characteristic flux density of each FRB is determined by the ```fl_ch``` parameter. The user can choose different ways to generate FRBs fluxes, via the ```modeFL```
 parameter. The implemented options are:
 
 - equal: all FRBs will have same flux = ```fl_ch``` (units of Jy/beam);
@@ -118,13 +118,16 @@ You can choose the different ToA simulation modes via the ```mode_inj``` paramet
 - uniform: the scans in which a given FRB will be injected is drawn randomly from the ensamble of scans of the given ```fld_inj``` field.
 - heavenly: as "uniform", but the first and the last scan will contain an FRB.
 
-```do_corrupt, ant_not_used, corr_ant, corruption, corrupt_table```: determine the visibility corruption modality. The user can choose wheter
-to corrupt or not with ```do_corrupt``` parameter. If this parameter is set to True, then the other parameters will be effective. ```ant_not_used``` defined the antennas you want to
+- ```do_corrupt, ant_not_used```: determine the visibility corruption modality. The user can choose wheter
+to corrupt or not with ```do_corrupt``` parameter. If this parameter is set to True, then the other parameters will be effective. ```ant_not_used``` defines the antennas you want to
 remove from the ```antID``` ensamble. NB: the same antenna must have been removed in the calibration steps used for obtaining the calibration
-tables at ```base_calib``` path. If you specify ```ant_not_used: All```, all the antennas will be considered. 
-```corr_ant``` defines the antenna in which you want to inject a phase offset (i.e. the antenna of which calibration solution you want to corrupt).
-```corrupt``` defines the amount of corruption (in units of deg) to inject in a given ```corr_ant```antenna's phase solution.
-```corrupt_table``` defines the type of calibration table in which the corruption will take place. For now only ```corrupt_table: mbd``` (mbd = multi-band delay) is implemented.
+tables at ```base_calib``` path. If you specify ```ant_not_used: All```, all the antennas will be considered.
+
+- ```corr_ant``` defines the antenna in which you want to inject a phase offset (i.e. the antenna of which calibration solution you want to corrupt).
+  
+- ```corruption``` defines the amount of corruption (in units of deg) to inject in a given ```corr_ant```antenna's phase solution.
+  
+- ```corrupt_table``` defines the type of calibration table in which the corruption will take place. For now only ```corrupt_table: mbd``` (mbd = multi-band delay) is implemented.
 The corruption will take place in the ```phi_0_c``` parameter of the mbd table.
 
 ## Dependencies
