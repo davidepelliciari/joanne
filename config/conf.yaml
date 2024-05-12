@@ -47,6 +47,6 @@ corruption:
 	ant_not_used: None
 	corr_ant: O8
 	corruption: 1.0
-	corrupt_table: mbd
+	corrupt_table: expCODE.mbd
 
 
