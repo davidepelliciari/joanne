@@ -2,7 +2,7 @@ general:
 	listobs_path: null
 	file_ToAs: /path/to/timeofarrivals.dat
 	EXPERIMENT: TEST
-	output_path: /path/to/base_path/
+	output_path: /path/to/output/
 
 calibration:
 	uvfile: /path/to/uvfits_file/.uvfits
