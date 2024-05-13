@@ -1061,7 +1061,9 @@ if(mystep in thesteps):
     peak = imstat(imagename=imout+".image", box=box_source)['max'][0]
     peak_str = "{:.4f}".format(peak)
 
+    snr = "{:.3f}".format(peak/rms_fromIm)
+
     print("## Writing fit to file: ", outputFIT_path)
     outFITfile = open(outputFIT_path, 'a')
-    outFITfile.write(str(nFRBs)+" "+deltaT+" "+peak_str+" "+rms_str+" "+RAfit+" "+decfit+"\n")
+    outFITfile.write(str(nFRBs)+" "+deltaT+" "+peak_str+" "+rms_str+" "+snr+" "+RAfit+" "+decfit+"\n")
     outFITfile.close()
