@@ -782,6 +782,7 @@ imsize = imaging_params[2]
 box_source = imaging_params[3]
 box_bkg = imaging_params[4]
 rms = imaging_params[5]
+
 # injection parameters
 nFRBs = injection_params[0]
 fl_ch = injection_params[1]         ## uncomment for simulations purpouse
