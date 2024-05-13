@@ -1,52 +1,50 @@
 general:
-	listobs_path: null
-	file_ToAs: /path/to/timeofarrivals.dat
-	EXPERIMENT: TEST
-	output_path: /path/to/output/
+  listobs_path: null
+  file_ToAs: null
+  EXPERIMENT: TEST
+  output_path: /home/davide/PHD/joanne_copy/mytest/
 
 calibration:
-	uvfile: /path/to/uvfits_file/.uvfits
-	ms: /path/to/msfile/.ms
-	base_calib: /path/to/calib_folder/
-	targetFLAG: /path/to/flags/FLAGtarget.flagcmd
-	bp_cal: J1829+4844
-	ph_cal: J0529+3209
-	target: R1_D
-	sbdtab: expCODE.sbd
-	mbdtab: expCODE.mbd
-	bpasstab: expCODE.bpass
-	Kselftab: null
-	pselftab: null
-	apselftab: null
-	antID: EF,TR,WB,NT,O8,CM,DA,DU,KN,PI,DE,JM,MC
+  uvfile: /home/davide/PHD/joanne_copy/mytest/ek051e.uvfits
+  ms: /home/davide/PHD/joanne_copy/mytest/ek051e.ms
+  base_calib: /home/davide/PHD/joanne_copy/mytest/
+  targetFLAG: /home/davide/PHD/joanne_copy/mytest/FLAGtarget.flagcmd
+  bp_cal: J1829+4844
+  ph_cal: J0529+3209
+  target: R1_D
+  sbdtab: ek051e_All.sbd
+  mbdtab: ek051e_All.mbd
+  bpasstab: ek051e_All.bpass
+  Kselftab: None
+  pselftab: None
+  apselftab: None
+  antID: EF,TR,WB,NT,O8,CM,DA,DU,KN,PI,DE,JM,MC
 
 imaging:
-	modeIM_single: DIRTY
-	modeIM_concat: CLEAN
-	imsize: 1280
-	box_region: 626,626,654,654
-	rms: 2.e-4
-	
+  modeIM_single: DIRTY
+  modeIM_concat: CLEAN
+  imsize: 1280
+  box_region: 626,626,654,654
+  rms: 2.e-4
+
 injection:
-	nFRBs: 15
-	fl_ch: 0.01
-	fl_std: 0.025
-	alpha_fl: -2
-	modeFL: equal
-	freq: 1.4GHz
-	BW: 0.256GHz
-	direction: J2000 05h31m58.700s +33d08m52.568s
-	cell: 3.6mas
-	t_start_inj: 2022/09/22/00:00:00
-	t_stop_inj: 2022/09/22/05:48:39
-	fld_inj: R1_D
-	mode_inj: uniform
+  nFRBs: 15
+  fl_ch: 0.01
+  fl_std: 0.025
+  alpha_fl: -2
+  modeFL: equal
+  freq: 1.4GHz
+  BW: 0.256GHz
+  direction: J2000 05h31m58.700s +33d08m52.568s
+  cell: 3.6mas
+  t_start_inj: 2022/09/22/00:00:00
+  t_stop_inj: 2022/09/22/05:48:39
+  fld_inj: R1_D
+  mode_inj: uniform
 
 corruption:
-	do_corrupt: False
-	ant_not_used: None
-	corr_ant: O8
-	corruption: 1.0
-	corrupt_table: expCODE.mbd
-
-
+  do_corrupt: False
+  ant_not_used: None
+  corr_ant: O8
+  corruption: 1.0
+  corrupt_table: ek051e_All.mbd
