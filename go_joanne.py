@@ -1055,9 +1055,13 @@ if(mystep in thesteps):
     getIMAGE(concat_vis, antennae, imout, modeIM_concat, imsize, rms)      ## get the DIRTY image of your injected-corrupted visibilities
     RAfit, decfit = extractFIT(imout+".image", box_source, fitlog_file)
 
-    rms = imstat(imagename=outms[:-3]+'_bkg.image', box='53, 892, 1232, 1250')['rms'][0]
+    rms_fromIm = imstat(imagename=imout+".image", box=box_bkg)['rms'][0]
+    rms_str = "{:.4f}".format(rms_fromIm)
+
+    peak = imstat(imagename=imout+".image", box=box_source)['max'][0]
+    peak_str = "{:.4f}".format(peak)
 
     print("## Writing fit to file: ", outputFIT_path)
     outFITfile = open(outputFIT_path, 'a')
-    outFITfile.write(str(nFRBs)+" "+deltaT+" "+str(fl_ch)+" "+str(rms)+" "+RAfit+" "+decfit+"\n")
+    outFITfile.write(str(nFRBs)+" "+deltaT+" "+peak_str+" "+rms_str+" "+RAfit+" "+decfit+"\n")
     outFITfile.close()
