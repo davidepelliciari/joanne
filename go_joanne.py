@@ -1062,6 +1062,13 @@ if(mystep in thesteps):
     default(concat)
     concat(vis=splitted_ms_names, concatvis=concat_vis)
 
+    if keep_ms != True:
+        print("## Removing single MS files..")
+        for ii in range(0,len(splitted_ms_names)):
+            os.system("rm -rf "+splitted_ms_names[ii])
+    else:
+        print("## Keeping single MS files..")
+        
 mystep = 5
 
 if(mystep in thesteps):
