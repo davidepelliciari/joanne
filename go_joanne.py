@@ -746,134 +746,129 @@ def extractFIT(im_name, box_region, logFILE):
 ############################################################# Main code #########################################################################
 # ---------------------------------------------------------------------------------------------------------------------------------------------- #
 
-if __name__ == "__main__":
+config_file = os.getcwd()+"/config/conf.yaml"
+print(config_file)
 
-    if len(sys.argv) > 1:
-        config_file = sys.argv[1]
-    else:
-        config_file = os.getcwd()+"/config/conf.yaml"
-
-    general_params, calibration_params, imaging_params, injection_params, corruption_params = read_config(config_file)
+general_params, calibration_params, imaging_params, injection_params, corruption_params = read_config(config_file)
 
     ########## visibilities
 
     # general parameters
-    listobs_path = general_params[0]
-    file_ToAs = general_params[1]
-    EXPERIMENT = general_params[2]
-    output_path = general_params[3]
+listobs_path = general_params[0]
+file_ToAs = general_params[1]
+EXPERIMENT = general_params[2]
+output_path = general_params[3]
 
     # calibration parameters
-    uvfile = calibration_params[0]
-    ms = calibration_params[1]
-    base_calib = calibration_params[2]
-    targetFLAG = calibration_params[3]
-    bp_cal = calibration_params[4]
-    ph_cal = calibration_params[5]
-    target = calibration_params[6]
-    sbdtab = base_calib+calibration_params[7]
-    mbdtab = base_calib+calibration_params[8]
-    bpasstab = base_calib+calibration_params[9]
-    Kselftab = base_calib+calibration_params[10]
-    pselftab = base_calib+calibration_params[11]
-    apselftab = base_calib+calibration_params[12]
-    antID = calibration_params[13]
+uvfile = calibration_params[0]
+ms = calibration_params[1]
+base_calib = calibration_params[2]
+targetFLAG = calibration_params[3]
+bp_cal = calibration_params[4]
+ph_cal = calibration_params[5]
+target = calibration_params[6]
+sbdtab = base_calib+calibration_params[7]
+mbdtab = base_calib+calibration_params[8]
+bpasstab = base_calib+calibration_params[9]
+Kselftab = base_calib+calibration_params[10]
+pselftab = base_calib+calibration_params[11]
+apselftab = base_calib+calibration_params[12]
+antID = calibration_params[13]
 
-    # imaging parameters
-    modeIM_single = imaging_params[0]
-    modeIM_concat = imaging_params[1]
-    imsize = imaging_params[2]
-    box_region = imaging_params[3]
-    rms = imaging_params[4]
+# imaging parameters
+modeIM_single = imaging_params[0]
+modeIM_concat = imaging_params[1]
+imsize = imaging_params[2]
+box_region = imaging_params[3]
+rms = imaging_params[4]
+# injection parameters
+nFRBs = injection_params[0]
+fl_ch = injection_params[1]
+fl_std = injection_params[2]
+alpha_fl = injection_params[3]
+modeFL = injection_params[4]
+freq = injection_params[5]
+BW = injection_params[6]
+direction = injection_params[7]
+cell =  injection_params[8]
+t_start_INJ = injection_params[9]
+t_stop_INJ = injection_params[10]
+fld_INJ = injection_params[11]
+modeINJ = injection_params[12]
 
-    # injection parameters
-    nFRBs = injection_params[0]
-    fl_ch = injection_params[1]
-    fl_std = injection_params[2]
-    alpha_fl = injection_params[3]
-    modeFL = injection_params[4]
-    freq = injection_params[5]
-    BW = injection_params[6]
-    direction = injection_params[7]
-    cell =  injection_params[8]
-    t_start_INJ = injection_params[9]
-    t_stop_INJ = injection_params[10]
-    fld_INJ = injection_params[11]
-    modeINJ = injection_params[12]
+# visibility corruption parameters
+doCorrupt = bool(corruption_params[0])
+ant_not_used = corruption_params[1]
+corr_ant = corruption_params[2]
+corruption = corruption_params[3]
+corrupt_table = base_calib+corruption_params[4]
 
-    # visibility corruption parameters
-    doCorrupt = bool(corruption_params[0])
-    ant_not_used = corruption_params[1]
-    corr_ant = corruption_params[2]
-    corruption = corruption_params[3]
-    corrupt_table = base_calib+corruption_params[4]
+base_EXP = output_path+EXPERIMENT+"/"
+outputFIT_path = base_EXP+EXPERIMENT+"_FITlog.txt"
 
-    base_EXP = output_path+EXPERIMENT+"/"
-    outputFIT_path = base_EXP+EXPERIMENT+"_FITlog.txt"
+newlistobs_path = output_path+'skimmedListobs.dat'
 
-    newlistobs_path = output_path+'skimmedListobs.dat'
+flux, str_fl = get_fluxes(nFRBs, modeFL, fl_ch, fl_std, alpha_fl)
+str_fl = str_fl+str(fl_ch)
+epoch, radir, decdir = direction.split(' ')
+deltaT = get_DeltaT(t_start_INJ, t_stop_INJ)
 
-    flux, str_fl = get_fluxes(nFRBs, modeFL, fl_ch, fl_std, alpha_fl)
-    str_fl = str_fl+str(fl_ch)
-    epoch, radir, decdir = direction.split(' ')
-    deltaT = get_DeltaT(t_start_INJ, t_stop_INJ)
+if is_non_empty_directory(base_EXP) == False:
 
-    if is_non_empty_directory(base_EXP) == False:
-    
-        print(base_EXP+" is not an existing, empty directory!")
-        print("..creating it")
-        os.system('mkdir '+base_EXP)
-
-
-    outDIR_INJ = base_EXP+str(nFRBs)+"FRB_"+deltaT+"_"+str_fl+"Jy"
-
-    ANT_notUSED = [ant_not_used]        ## specify which antenna has not been used for applycal
-
-    selANT = False
-    if ANT_notUSED != ['None']:
-        selANT = True
-
-    corrANT = [corr_ant]
-
-    print("Not considering following antennas: ", ANT_notUSED)
+    print(base_EXP+" is not an existing, empty directory!")
+    print("..creating it")
+    os.system('mkdir '+base_EXP)
 
 
-    antennae, ANT_notUSED_dir, ant_notUSED = getAntennae(ANT_notUSED)
-    mask, CORRANT, ant_toCorr, doCorrupt = getAntennae_toCorrupt(corruption, corrANT, ANT_notUSED, doCorrupt, antID)
+outDIR_INJ = base_EXP+str(nFRBs)+"FRB_"+deltaT+"_"+str_fl+"Jy"
 
-    if selANT:
-        outDIR_INJ = outDIR_INJ+"_notUSED_"+ANT_notUSED_dir
-        if doCorrupt:
-            outDIR_INJ = outDIR_INJ+"_notUSED_"+ANT_notUSED_dir+"_"+CORRANT+"_corrupted_"+str(corruption)+"deg/"
-        else:
-            outDIR_INJ = outDIR_INJ+"/"
-    elif doCorrupt:
-        outDIR_INJ = outDIR_INJ+"_"+CORRANT+"_corrupted_"+str(corruption)+"deg/"
+ANT_notUSED = [ant_not_used]        ## specify which antenna has not been used for applycal
+
+selANT = False
+if ANT_notUSED != ['None']:
+    selANT = True
+
+corrANT = [corr_ant]
+
+print("Not considering following antennas: ", ANT_notUSED)
+
+
+antennae, ANT_notUSED_dir, ant_notUSED = getAntennae(ANT_notUSED)
+mask, CORRANT, ant_toCorr, doCorrupt = getAntennae_toCorrupt(corruption, corrANT, ANT_notUSED, doCorrupt, antID)
+
+if selANT:
+    outDIR_INJ = outDIR_INJ+"_notUSED_"+ANT_notUSED_dir
+    if doCorrupt:
+        outDIR_INJ = outDIR_INJ+"_notUSED_"+ANT_notUSED_dir+"_"+CORRANT+"_corrupted_"+str(corruption)+"deg/"
     else:
         outDIR_INJ = outDIR_INJ+"/"
+elif doCorrupt:
+    outDIR_INJ = outDIR_INJ+"_"+CORRANT+"_corrupted_"+str(corruption)+"deg/"
+else:
+    outDIR_INJ = outDIR_INJ+"/"
 
 
-    # --------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------
 
-    if is_non_empty_directory(base_calib) == False:
+if is_non_empty_directory(base_calib) == False:
     
-        print(base_calib+" is not an existing, non empty directory!")
-        print("Using all antennas instead, i.e. using calibration from All")
-        antennae = '*&*'
-        ANT_notUSED_dir = 'None'
+    print(base_calib+" is not an existing, non empty directory!")
+    print("Using all antennas instead, i.e. using calibration from All")
+    antennae = '*&*'
+    ANT_notUSED_dir = 'None'
 
 
-    thetable = base_calib+corrupt_table
-    expcode, corr_ant = corrupt_table.split(".")
-    corr_table = base_calib+expcode+"_inj"+corr_ant
+thetable = base_calib+corrupt_table
+expcode, corr_ant = corrupt_table.split(".")
+corr_table = base_calib+expcode+"_inj"+corr_ant
 
-    print("## The corrupted table (copy of it) will be: ")
-    print(corr_table)
+print("## The corrupted table (copy of it) will be: ")
+print(corr_table)
 
-    ######################################################################
+######################################################################
 
-    thesteps = []
-    step_title = {0: 'Import UVFITS in a CASA measurement set (MS) (importuvfits) + flag data (flagdata)',
+thesteps = []
+step_title = {0: 'Import UVFITS in a CASA measurement set (MS) (importuvfits) + flag data (flagdata)',
                 1: 'Divide the MS in multiple chunks at fake FRBs ToAs (split)',
                 2: 'Apply calibration tables to the splitted MSs (applycal) + Clean other RFIs in CORRECTED data (rflag)',
                 3: 'Create and inject a fake point source in splitted MSs',
@@ -881,181 +876,182 @@ if __name__ == "__main__":
                 5: 'Get the dirty/cleaned image of the concatenate MS file (tclean)'
                 }
 
-    thesteps = []
+thesteps = []
 
-    try:
-        print('## List of steps to be executed: ', mysteps)
-        thesteps = mysteps
+try:
+    print('## List of steps to be executed: ', mysteps)
+    thesteps = mysteps
 
-    except:
-        print('## Global variable mystep not set')
+except:
+    print('## Global variable mystep not set')
 
-    if(thesteps==[]):
+if(thesteps==[]):
 
-        thesteps = range(0,len(step_title))
-        print('## Executing all steps: ', thesteps)
+    thesteps = range(0,len(step_title))
+    print('## Executing all steps: ', thesteps)
 
 
-    ## Import UVFITS in MS
+## Import UVFITS in MS
 
-    mystep = 0
+mystep = 0
 
-    if(mystep in thesteps):
+if(mystep in thesteps):
 
-        #print("rm -rf "+ms+"*")
-        #os.system('rm -rf '+ms+"*")
+    #print("rm -rf "+ms+"*")
+    #os.system('rm -rf '+ms+"*")
     
-        print("## Importing from .. "+uvfile)
-        print("## MS file will be .. : "+ms)
+    print("## Importing from .. "+uvfile)
+    print("## MS file will be .. : "+ms)
 
-        default(importuvfits)
-        importuvfits(fitsfile=uvfile, vis=ms)
+    default(importuvfits)
+    importuvfits(fitsfile=uvfile, vis=ms)
 
-        default(flagdata)
-        flagdata(mode='manual', vis=ms, autocorr=True)
+    default(flagdata)
+    flagdata(mode='manual', vis=ms, autocorr=True)
 
-        default(flagmanager)
-        flagmanager(vis=ms, mode='save', versionname='originalMS')
+    default(flagmanager)
+    flagmanager(vis=ms, mode='save', versionname='originalMS')
 
-        default(flagdata)
-        flagdata(vis=ms, mode='manual', spw='0:0~6;58~63,1:0~6;58~63,2:0~6;58~63,3:0~6;58~63,4:0~6;58~63,5:0~6;58~63,6:0~6;58~63,7:0~6;58~63')
+    default(flagdata)
+    flagdata(vis=ms, mode='manual', spw='0:0~6;58~63,1:0~6;58~63,2:0~6;58~63,3:0~6;58~63,4:0~6;58~63,5:0~6;58~63,6:0~6;58~63,7:0~6;58~63')
 
-        default(flagmanager)
-        flagmanager(vis=ms, mode='save', versionname='originalMS_v1')
+    default(flagmanager)
+    flagmanager(vis=ms, mode='save', versionname='originalMS_v1')
 
-        default(flagdata)
-        flagdata(vis=ms, mode='list', inpfile=targetFLAG, antenna=antennae)
+    default(flagdata)
+    flagdata(vis=ms, mode='list', inpfile=targetFLAG, antenna=antennae)
 
-    mystep = 1
+mystep = 1
 
-    if(mystep in thesteps):
+if(mystep in thesteps):
 
-        if listobs_path is not None and os.path.exists(listobs_path):
-            print("## Considering listobs file.. ", listobs_path)
+    if listobs_path is not None and os.path.exists(listobs_path):
+        print("## Considering listobs file.. ", listobs_path)
 
-        else:
-            print("## No LISTOBS path set. Creating it..")
-            listobs_path = output_path+expcode+".listobs"
-            listobs(vis=ms, listfile=listobs_path)
+    else:
+        print("## No LISTOBS path set. Creating it..")
+        listobs_path = output_path+expcode+".listobs"
+        listobs(vis=ms, listfile=listobs_path)
     
-        if outDIR_INJ is not None and os.path.exists(outDIR_INJ):
-            print("## Splitting MS files in directory: ", outDIR_INJ)
-        else:
-            print("## Creating directory for split.. ", str(outDIR_INJ))
-            os.system("mkdir "+outDIR_INJ)
+    if outDIR_INJ is not None and os.path.exists(outDIR_INJ):
+        print("## Splitting MS files in directory: ", outDIR_INJ)
+    
+    else:
+        print("## Creating directory for split.. ", str(outDIR_INJ))
+        os.system("mkdir "+outDIR_INJ)
 
-        if modeINJ != 'from_file':
+    if modeINJ != 'from_file':
 
-            skim_listobs(listobs_path, newlistobs_path)
-            scan_data = get_scans(newlistobs_path, fld_INJ)
-            sel_toas = get_injected_times(outDIR_INJ, scan_data, nFRBs, modeINJ, t_start_INJ, t_stop_INJ)
+        skim_listobs(listobs_path, newlistobs_path)
+        scan_data = get_scans(newlistobs_path, fld_INJ)
+        sel_toas = get_injected_times(outDIR_INJ, scan_data, nFRBs, modeINJ, t_start_INJ, t_stop_INJ)
 
-        else:
+    else:
 
-            print("## Reading FRB ToAs from external file: ", file_ToAs)
-            sel_toas = np.genfromtxt(file_ToAs, dtype=str)
+        print("## Reading FRB ToAs from external file: ", file_ToAs)
+        sel_toas = np.genfromtxt(file_ToAs, dtype=str)
 
-        splitted_ms_names = []
+    splitted_ms_names = []
 
-        for ii in range(0,len(sel_toas)):
+    for ii in range(0,len(sel_toas)):
 
-            outms = outDIR_INJ+expcode+"_INJ_"+str(ii)+".ms"
-            toa = parse_datetime(sel_toas[ii])
+        outms = outDIR_INJ+expcode+"_INJ_"+str(ii)+".ms"
+        toa = parse_datetime(sel_toas[ii])
 
-            start_split_DT = toa - timedelta(seconds=0.5)
-            stop_split_DT = toa + timedelta(seconds=0.5)
-            start_split = start_split_DT.strftime('%Y/%m/%d/%H:%M:%S.%f')
-            stop_split = stop_split_DT.strftime('%Y/%m/%d/%H:%M:%S.%f')
-            timerange = start_split+"~"+stop_split
+        start_split_DT = toa - timedelta(seconds=0.5)
+        stop_split_DT = toa + timedelta(seconds=0.5)
+        start_split = start_split_DT.strftime('%Y/%m/%d/%H:%M:%S.%f')
+        stop_split = stop_split_DT.strftime('%Y/%m/%d/%H:%M:%S.%f')
+        timerange = start_split+"~"+stop_split
 
-            print("## Timerange: ", timerange)
-            default(split)
-            split(vis=ms, outputvis=outms, field=fld_INJ, datacolumn='data', timerange=timerange)
+        print("## Timerange: ", timerange)
+        default(split)
+        split(vis=ms, outputvis=outms, field=fld_INJ, datacolumn='data', timerange=timerange)
 
-            splitted_ms_names.append(outms)
+        splitted_ms_names.append(outms)
 
 
-    mystep = 2
+mystep = 2
 
-    if(mystep in thesteps):
+if(mystep in thesteps):
 
-        for outms in splitted_ms_names:
+    for outms in splitted_ms_names:
 
-            default(applycal)
-            applycal(vis=outms,
-                field='',
-                antenna=antennae,
-                gaintable=[sbdtab, bpasstab, mbdtab],
-                interp=['nearest', 'nearest,nearest', 'linear'],
-                spwmap=[[],[],[0,0,0,0,0,0,0,0]],
-                gainfield=[bp_cal, bp_cal, ph_cal],
-                applymode='calonly',
-                parang=False)
+        default(applycal)
+        applycal(vis=outms,
+            field='',
+            antenna=antennae,
+            gaintable=[sbdtab, bpasstab, mbdtab],
+            interp=['nearest', 'nearest,nearest', 'linear'],
+            spwmap=[[],[],[0,0,0,0,0,0,0,0]],
+            gainfield=[bp_cal, bp_cal, ph_cal],
+            applymode='calonly',
+            parang=False)
 
-            default(flagdata)
-            flagdata(mode='rflag', vis=outms, field=fld_INJ, antenna=antennae, datacolumn='corrected', flagbackup=False, timedevscale=5.0, freqdevscale=5.0)
+        default(flagdata)
+        flagdata(mode='rflag', vis=outms, field=fld_INJ, antenna=antennae, datacolumn='corrected', flagbackup=False, timedevscale=5.0, freqdevscale=5.0)
 
-            #(outms, antennae, outms[:-3]+'_bkg', 'DIRTY')         ## if you want to look at the image pre-injection
-            #rms = imstat(imagename=outms[:-3]+'_bkg.image', box='53, 892, 1232, 1250')['rms'][0]
+        #(outms, antennae, outms[:-3]+'_bkg', 'DIRTY')         ## if you want to look at the image pre-injection
+        #rms = imstat(imagename=outms[:-3]+'_bkg.image', box='53, 892, 1232, 1250')['rms'][0]
 
-            #print("## Injected burst ", outms, " rms of DIRTY image (pre-injection): ", rms)
+        #print("## Injected burst ", outms, " rms of DIRTY image (pre-injection): ", rms)
 
-    mystep = 3
+mystep = 3
 
-    if(mystep in thesteps):
+if(mystep in thesteps):
 
-        print("## Fluxes will be: ")
-        print(flux)
+    print("## Fluxes will be: ")
+    print(flux)
 
-        for ii in range(0,len(splitted_ms_names)):
+    for ii in range(0,len(splitted_ms_names)):
 
-            fl = flux[ii]
+        fl = flux[ii]
 
-            outms = splitted_ms_names[ii]
+        outms = splitted_ms_names[ii]
 
-            im_name = outDIR_INJ+"TESTpoint_"+str_fl+"Jy"
-            out_name = im_name+".cl"
+        im_name = outDIR_INJ+"TESTpoint_"+str_fl+"Jy"
+        out_name = im_name+".cl"
         
-            modelPointSource(outms, fl, direction, freq, BW, cell, radir, decdir, im_name, out_name)
+        modelPointSource(outms, fl, direction, freq, BW, cell, radir, decdir, im_name, out_name)
 
-            # if no corruption has to be applied then you want only to inject the point source into CORRECTED_DATA column
-            if doCorrupt:
+        # if no corruption has to be applied then you want only to inject the point source into CORRECTED_DATA column
+        if doCorrupt:
 
-                imout = outDIR_INJ+"injectedFRB_"+str_fl+"Jy_"+CORRANT+"_"+str(corruption)+'deg'     # final DIRTY image name
+            imout = outDIR_INJ+"injectedFRB_"+str_fl+"Jy_"+CORRANT+"_"+str(corruption)+'deg'     # final DIRTY image name
 
-                print("## Corrupting visibilities.. corruption: ", corruption, " deg")
-                corruptVIS(outms, corruption, thetable, corr_table, antID, mask, base_calib)
-                #getIMAGE(outms, antennae, imout, modeIM_single, imsize)      ## get the DIRTY image of your injected-corrupted visibilities
-                print("## Done!")
+            print("## Corrupting visibilities.. corruption: ", corruption, " deg")
+            corruptVIS(outms, corruption, thetable, corr_table, antID, mask, base_calib)
+            #getIMAGE(outms, antennae, imout, modeIM_single, imsize)      ## get the DIRTY image of your injected-corrupted visibilities
+            print("## Done!")
 
-            else:
+        else:
 
-                imout = outms[:-3]+"_"+modeIM_single
-                default(uvsub)
-                uvsub(vis=outms, reverse=True)
-                #getIMAGE(outms, antennae, imout, modeIM_single, imsize)
+            imout = outms[:-3]+"_"+modeIM_single
+            default(uvsub)
+            uvsub(vis=outms, reverse=True)
+            #getIMAGE(outms, antennae, imout, modeIM_single, imsize)
 
-    mystep = 4
+mystep = 4
 
-    if(mystep in thesteps):
+if(mystep in thesteps):
 
-        concat_vis = outDIR_INJ+"CONCAT_"+str(nFRBs)+"FRB_"+deltaT+".ms"
+    concat_vis = outDIR_INJ+"CONCAT_"+str(nFRBs)+"FRB_"+deltaT+".ms"
 
-        print("SPLITTED MS NAMES: ", splitted_ms_names)
-        default(concat)
-        concat(vis=splitted_ms_names, concatvis=concat_vis)
+    print("SPLITTED MS NAMES: ", splitted_ms_names)
+    default(concat)
+    concat(vis=splitted_ms_names, concatvis=concat_vis)
 
-    mystep = 5
+mystep = 5
 
-    if(mystep in thesteps):
+if(mystep in thesteps):
 
-        print("## ready for tclean..")
-        imout = outDIR_INJ+"CONCAT_"+str(nFRBs)+"FRB_"+deltaT+"_"+modeIM_concat
-        fitlog_file = outDIR_INJ+"imfit_logger.log"
-        getIMAGE(concat_vis, antennae, imout, modeIM_concat, imsize, rms)      ## get the DIRTY image of your injected-corrupted visibilities
-        RAfit, decfit = extractFIT(imout+".image", box_region, fitlog_file)
+    print("## ready for tclean..")
+    imout = outDIR_INJ+"CONCAT_"+str(nFRBs)+"FRB_"+deltaT+"_"+modeIM_concat
+    fitlog_file = outDIR_INJ+"imfit_logger.log"
+    getIMAGE(concat_vis, antennae, imout, modeIM_concat, imsize, rms)      ## get the DIRTY image of your injected-corrupted visibilities
+    RAfit, decfit = extractFIT(imout+".image", box_region, fitlog_file)
 
-        print("## writing fit to file: ", outputFIT_path)
-        outFITfile = open(outputFIT_path, 'a')
-        outFITfile.write(str(nFRBs)+" "+deltaT+" "+str(fl_ch)+" "+str(rms)+" "+RAfit+" "+decfit+"\n")
-        outFITfile.close()
+    print("## writing fit to file: ", outputFIT_path)
+    outFITfile = open(outputFIT_path, 'a')
+    outFITfile.write(str(nFRBs)+" "+deltaT+" "+str(fl_ch)+" "+str(rms)+" "+RAfit+" "+decfit+"\n")
+    outFITfile.close()
