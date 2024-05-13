@@ -127,6 +127,16 @@ tables at ```base_calib``` path. If you specify ```ant_not_used: All```, all the
 - ```corrupt_table``` defines the type of calibration table in which the corruption will take place. For now only ```corrupt_table: mbd``` (mbd = multi-band delay) is implemented.
 The corruption will take place in the ```phi_0_c``` parameter of the mbd table.
 
+## Output format
+
+The output of the code will be stored at ```output_path```+```EXPERIMENT``` directory, and includes combined and splitted MS files, along with images of the combined visibilities.
+Additionaly, in the same directory the user will find a .txt file containing a 2D gaussian fit to the injected point source. The header of this output file is the following:
+
+```python
+nFRBs Time_interval_for_injections fitted_peak_flux rms_from_image S/N RA_fit +/- RA_err dec_fit +/- dec_err
+```
+
+
 ## Dependencies
 
 ```python
