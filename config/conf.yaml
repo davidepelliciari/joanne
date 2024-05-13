@@ -27,6 +27,7 @@ imaging:
   box_region: 626,626,654,654
   box_bkg: 54,68,1188,565
   rms: 2.e-4
+  keep_single_ms: False
 
 injection:
   nFRBs: 15
