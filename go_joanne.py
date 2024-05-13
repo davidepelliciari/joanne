@@ -65,7 +65,8 @@ def read_config(config="config/conf.yaml"):
     imaging_params.append(data_loaded['imaging']['modeIM_single'])
     imaging_params.append(data_loaded['imaging']['modeIM_concat'])
     imaging_params.append(data_loaded['imaging']['imsize'])
-    imaging_params.append(data_loaded['imaging']['box_region'])
+    imaging_params.append(data_loaded['imaging']['box_source'])
+    imaging_params.append(data_loaded['imaging']['box_bkg'])
     imaging_params.append(data_loaded['imaging']['rms'])
 
 
@@ -713,11 +714,11 @@ def get_fluxes(nFRBs, modeFL, fl_ch, fl_std=None, alpha=None):
 ###############################################################################################
 
 
-# extractFIT: extracts best-fit RA Dec (+- errors) from an image (.image) given a box_region. The information is extracted from a log file written by imfit task.
-def extractFIT(im_name, box_region, logFILE):
+# extractFIT: extracts best-fit RA Dec (+- errors) from an image (.image) given a box_source. The information is extracted from a log file written by imfit task.
+def extractFIT(im_name, box_source, logFILE):
 
     default(imfit)
-    imfit(imagename=im_name, box=box_region, logfile=logFILE)
+    imfit(imagename=im_name, box=box_source, logfile=logFILE)
 
     ra_lines = ""
     dec_lines = ""
@@ -758,7 +759,7 @@ file_ToAs = general_params[1]
 EXPERIMENT = general_params[2]
 output_path = general_params[3]
 
-    # calibration parameters
+# calibration parameters
 uvfile = calibration_params[0]
 ms = calibration_params[1]
 base_calib = calibration_params[2]
@@ -778,11 +779,12 @@ antID = calibration_params[13]
 modeIM_single = imaging_params[0]
 modeIM_concat = imaging_params[1]
 imsize = imaging_params[2]
-box_region = imaging_params[3]
-rms = imaging_params[4]
+box_source = imaging_params[3]
+box_bkg = imaging_params[4]
+rms = imaging_params[5]
 # injection parameters
 nFRBs = injection_params[0]
-#fl_ch = injection_params[1]         ## uncomment for simulations purpouse
+fl_ch = injection_params[1]         ## uncomment for simulations purpouse
 fl_std = injection_params[2]
 alpha_fl = injection_params[3]
 modeFL = injection_params[4]
@@ -819,7 +821,10 @@ if is_non_empty_directory(base_EXP) == False:
     os.system('mkdir '+base_EXP)
 
 
-outDIR_INJ = base_EXP+str(nFRBs)+"FRB_"+deltaT+"_"+str_fl+"Jy"
+if nsim is not None:
+    outDIR_INJ = base_EXP+str(nFRBs)+"FRB_"+deltaT+"_"+str_fl+"Jy_"+str(nsim)
+else:
+    outDIR_INJ = base_EXP+str(nFRBs)+"FRB_"+deltaT+"_"+str_fl+"Jy_"
 
 ANT_notUSED = [ant_not_used]        ## specify which antenna has not been used for applycal
 
@@ -859,7 +864,7 @@ if is_non_empty_directory(base_calib) == False:
 
 thetable = base_calib+corrupt_table
 expcode, corr_ant = corrupt_table.split(".")
-corr_table = base_calib+expcode+"_inj"+corr_ant
+corr_table = base_calib+expcode+"_inj."+corr_ant
 
 print("## The corrupted table (copy of it) will be: ")
 print(corr_table)
@@ -1047,7 +1052,9 @@ if(mystep in thesteps):
     imout = outDIR_INJ+"CONCAT_"+str(nFRBs)+"FRB_"+deltaT+"_"+modeIM_concat
     fitlog_file = outDIR_INJ+"imfit_logger.log"
     getIMAGE(concat_vis, antennae, imout, modeIM_concat, imsize, rms)      ## get the DIRTY image of your injected-corrupted visibilities
-    RAfit, decfit = extractFIT(imout+".image", box_region, fitlog_file)
+    RAfit, decfit = extractFIT(imout+".image", box_source, fitlog_file)
+
+    rms = imstat(imagename=outms[:-3]+'_bkg.image', box='53, 892, 1232, 1250')['rms'][0]
 
     print("## Writing fit to file: ", outputFIT_path)
     outFITfile = open(outputFIT_path, 'a')
