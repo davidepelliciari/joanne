@@ -744,9 +744,26 @@ def extractFIT(im_name, box_source, logFILE):
     return RESULTS_RA, RESULTS_DEC
 
 
+###############################################################################################
+
+
+## convert_dec: takes a declination string and returns a formatted string, ready to be read by astropy
+def convert_dec(dec):
+    match = re.search(r'([-+]?\d+\.\d+\.\d+\.\d+)', dec)
+    if match:
+        num = match.group(1)
+        num_nozero = re.sub(r'\+0*', '+', num)
+        num_nozero = re.sub(r'-0*', '-', num_nozero)
+        formatted = re.sub(r'(\d+)\.(\d+)\.(\d+)\.(\d+)', r'\1:\2:\3.\4', num_nozero)
+        return dec.replace(num, formatted)
+    else:
+        return None
+
+
 # ---------------------------------------------------------------------------------------------------------------------------------------------- #
 ############################################################# Main code #########################################################################
 # ---------------------------------------------------------------------------------------------------------------------------------------------- #
+
 
 config_file = "./config/conf.yaml"
 print(config_file)
@@ -1054,16 +1071,13 @@ if(mystep in thesteps):
     fitlog_file = outDIR_INJ+"imfit_logger.log"
     getIMAGE(concat_vis, antennae, imout, modeIM_concat, imsize, rms)      ## get the DIRTY image of your injected-corrupted visibilities
     RAfit, decfit = extractFIT(imout+".image", box_source, fitlog_file)
-
+    decfit_form = convert_dec(decfit)
     rms_fromIm = imstat(imagename=imout+".image", box=box_bkg)['rms'][0]
     rms_str = "{:.4f}".format(rms_fromIm)
-
     peak = imstat(imagename=imout+".image", box=box_source)['max'][0]
     peak_str = "{:.4f}".format(peak)
-
     snr = "{:.3f}".format(peak/rms_fromIm)
-
     print("## Writing fit to file: ", outputFIT_path)
     outFITfile = open(outputFIT_path, 'a')
-    outFITfile.write(str(nFRBs)+" "+deltaT+" "+peak_str+" "+rms_str+" "+snr+" "+RAfit+" "+decfit+"\n")
+    outFITfile.write(str(nFRBs)+" "+deltaT+" "+peak_str+" "+rms_str+" "+snr+" "+RAfit+" "+decfit_form+"\n")
     outFITfile.close()
