@@ -51,6 +51,7 @@ imaging:
     imsize: 1280
     box_region: 626,626,654,654
     rms: 2.e-4
+    keep_single_ms: False
 
 injection:
     nFRBs: 15
