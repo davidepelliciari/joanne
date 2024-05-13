@@ -147,7 +147,7 @@ def inject_phase_offset(arr, ant, sigma, antID):
             #noise_ant = array_ant + np.random.normal(0, sigma[ii], len(array_ant))    #inject gaussian noise
             newarr[ii::N_ant] = noise_ant
         
-        print("Doing nothing")
+        print("## Doing nothing")
 
     return newarr
 
@@ -207,13 +207,13 @@ def corruptVIS(ms, corrFACT, origtable, corr_table, antID, mask, base_calib):
 
     if allANT:
 
-        print("STO USANDO TUTTE LE ANTENNE", allANT)
+        print("## Considering all antennas", allANT)
         antUSED = "All"
         str_corrFACT = 'All'
 
     if noANTS:
 
-        print("CORROMPO 0 ANTENNE", noANTS)
+        print("## No corruption applied", noANTS)
         antUSED = "None"
 
     if corrFACT == 0.:
@@ -267,17 +267,17 @@ def corruptVIS(ms, corrFACT, origtable, corr_table, antID, mask, base_calib):
 def getIMAGE(ms, antennae, imout, mode, imsize=1280, rms=None):
 
     if mode == 'DIRTY':
-        print("## making a dirty image")
+        print("## Making a dirty image")
         nitter = 0
         inter = False
     else:
-        print("## making a cleaned image")
+        print("## Making a cleaned image")
         nitter = 1000
         inter = False
         thresh = "{:.2f}".format(rms/1000.)
         thresh = thresh+'mJy'
 
-    print("eliminating imout: ", imout)
+    print("## Eliminating imout: ", imout)
     os.system('rm -r '+imout+'*')
 
     default(tclean)
@@ -299,7 +299,7 @@ def getIMAGE(ms, antennae, imout, mode, imsize=1280, rms=None):
            #nsigma=3,
            parallel=False)
 
-    print('Done with tclean, exporting DIRTY image in FITS file..')
+    print('## Done with tclean, exporting DIRTY image in FITS file..')
 
     default(exportfits)
     exportfits(imagename=imout+'.image', fitsimage=imout+'.fits', history=False)
@@ -400,7 +400,6 @@ def get_ToAs_in_scan(t_start, t_stop):
 def get_injected_times(dirTOA, scan_data, num_events, mode='uniform', t_start=None, t_stop=None):
    
     num_scans = len(scan_data)
-    print("LEN SCAN DATA: ", num_scans)
     event_counts = np.zeros(num_scans, dtype=int)
     if t_start is not None:
         t_start = parse_datetime(t_start)
@@ -419,6 +418,7 @@ def get_injected_times(dirTOA, scan_data, num_events, mode='uniform', t_start=No
         start_index = next(i for i, (start, stop) in enumerate(scan_data) if parse_datetime(start) >= t_start)
         end_index = next(i for i, (start, stop) in enumerate(scan_data) if parse_datetime(stop) >= t_stop)
     scan_data = scan_data[start_index:end_index]
+    print("## Number of scans considered for the injection: ", len(scan_data))
     event_counts = np.zeros(len(scan_data), dtype=int)
     num_scans_in_range = len(scan_data)
     if num_events > 3:
@@ -458,7 +458,7 @@ def get_injected_times(dirTOA, scan_data, num_events, mode='uniform', t_start=No
     else:
         mid_index = int(num_scans_in_range / 2)
         event_counts[mid_index] = 1
-    print("## EVENTI DA GENERARE NEI SINGOLI SCANS:")
+    print("## Number of instant point sources per scan: ")
     print(event_counts)
     sel_tstart = [sublist[0] for sublist in scan_data]
     sel_tstop = [sublist[1] for sublist in scan_data]
@@ -473,7 +473,7 @@ def get_injected_times(dirTOA, scan_data, num_events, mode='uniform', t_start=No
             for index in selected_indices:
                 sel_toas.append(toas_per_scan[index])
                 output_file.write(str(toas_per_scan[index])+"\n")
-    print("Number of time of arrivals: ", len(sel_toas))
+    print("## Number of time of arrivals: ", len(sel_toas))
     output_file.close()
 
     return sel_toas
@@ -569,7 +569,7 @@ def skim_listobs(input_file_path, output_file_path):
         updated_lines.append(line)
     date, idx_date = find_date_to_add(updated_lines)
     if date is None:
-        print("WARNING: no date time found to be added to listobs..")
+        print("## WARNING: no date time found to be added to listobs..")
         return
     unmod_rows = [add_date(updated_lines[ii].strip(), '', 'multi') for ii in range(1, idx_date+1)]
     first_dates = []
@@ -577,7 +577,7 @@ def skim_listobs(input_file_path, output_file_path):
         first_match = re.search(r'\d{2}-[A-Za-z]{3}-\d{4}/', rows)
         if first_match:
             first_dates.append(first_match.group(0))
-            print(first_match)
+            #print(first_match)
     unmod_rows = [add_date(updated_lines[ii].strip(), first_dates[ii-1], 'single') for ii in range(1, idx_date+1)]
     mod_rows = [add_date(updated_lines[ii].strip(), date, 'multi') for ii in range(idx_date+1, len(updated_lines))]
     with open(output_file_path, "w") as file_out:
@@ -733,7 +733,7 @@ def extractFIT(im_name, box_region, logFILE):
             ra_info = ra_match.group(1).strip()
             ra_lines = "--- ra: " + ra_info
         else:
-            print("Nessuna corrispondenza trovata per ra_line:", ra_line)
+            print("## No correspondence for ra_line", ra_line)
 
     dec_info = dec_line.split(":")[1].strip()
     dec_lines = "--- dec: " + dec_info
@@ -747,14 +747,12 @@ def extractFIT(im_name, box_region, logFILE):
 ############################################################# Main code #########################################################################
 # ---------------------------------------------------------------------------------------------------------------------------------------------- #
 
-config_file = "/home/davide/PHD/joanne_copy/config/conf.yaml"
+config_file = "./config/conf.yaml"
 print(config_file)
 
 general_params, calibration_params, imaging_params, injection_params, corruption_params = read_config(config_file)
 
-    ########## visibilities
-
-    # general parameters
+# general parameters
 listobs_path = general_params[0]
 file_ToAs = general_params[1]
 EXPERIMENT = general_params[2]
@@ -784,7 +782,7 @@ box_region = imaging_params[3]
 rms = imaging_params[4]
 # injection parameters
 nFRBs = injection_params[0]
-fl_ch = injection_params[1]
+#fl_ch = injection_params[1]         ## uncomment for simulations purpouse
 fl_std = injection_params[2]
 alpha_fl = injection_params[3]
 modeFL = injection_params[4]
@@ -816,8 +814,8 @@ deltaT = get_DeltaT(t_start_INJ, t_stop_INJ)
 
 if is_non_empty_directory(base_EXP) == False:
 
-    print(base_EXP+" is not an existing, empty directory!")
-    print("..creating it")
+    print("## "+base_EXP+" is not an existing, empty directory!")
+    print("## ..creating it")
     os.system('mkdir '+base_EXP)
 
 
@@ -831,7 +829,7 @@ if ANT_notUSED != ['None']:
 
 corrANT = [corr_ant]
 
-print("Not considering following antennas: ", ANT_notUSED)
+print("## Not considering following antennas: ", ANT_notUSED)
 
 
 antennae, ANT_notUSED_dir, ant_notUSED = getAntennae(ANT_notUSED)
@@ -853,8 +851,8 @@ else:
 
 if is_non_empty_directory(base_calib) == False:
     
-    print(base_calib+" is not an existing, non empty directory!")
-    print("Using all antennas instead, i.e. using calibration from All")
+    print("## "+base_calib+" is not an existing, non empty directory!")
+    print("## Using all antennas instead, i.e. using calibration from All")
     antennae = '*&*'
     ANT_notUSED_dir = 'None'
 
@@ -1038,8 +1036,6 @@ mystep = 4
 if(mystep in thesteps):
 
     concat_vis = outDIR_INJ+"CONCAT_"+str(nFRBs)+"FRB_"+deltaT+".ms"
-
-    print("SPLITTED MS NAMES: ", splitted_ms_names)
     default(concat)
     concat(vis=splitted_ms_names, concatvis=concat_vis)
 
@@ -1047,13 +1043,13 @@ mystep = 5
 
 if(mystep in thesteps):
 
-    print("## ready for tclean..")
+    print("## Ready for tclean..")
     imout = outDIR_INJ+"CONCAT_"+str(nFRBs)+"FRB_"+deltaT+"_"+modeIM_concat
     fitlog_file = outDIR_INJ+"imfit_logger.log"
     getIMAGE(concat_vis, antennae, imout, modeIM_concat, imsize, rms)      ## get the DIRTY image of your injected-corrupted visibilities
     RAfit, decfit = extractFIT(imout+".image", box_region, fitlog_file)
 
-    print("## writing fit to file: ", outputFIT_path)
+    print("## Writing fit to file: ", outputFIT_path)
     outFITfile = open(outputFIT_path, 'a')
     outFITfile.write(str(nFRBs)+" "+deltaT+" "+str(fl_ch)+" "+str(rms)+" "+RAfit+" "+decfit+"\n")
     outFITfile.close()
