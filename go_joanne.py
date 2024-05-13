@@ -31,7 +31,7 @@ plt.rc('axes', linewidth=2)
 def read_config(config="config/conf.yaml"):
 
     with open(config, 'r') as stream:
-        data_loaded = yaml.load(stream)
+        data_loaded = yaml.load(stream, yaml.SafeLoader)
 
     general_params = []
     calibration_params = []
@@ -40,10 +40,10 @@ def read_config(config="config/conf.yaml"):
     corruption_params = []
 
     # general paths
-    general_params.append(data_loaded['general']['base'])
     general_params.append(data_loaded['general']['listobs_path'])
     general_params.append(data_loaded['general']['file_ToAs'])
     general_params.append(data_loaded['general']['EXPERIMENT'])
+    general_params.append(data_loaded['general']['output_path'])
 
     # calibration parameters
     calibration_params.append(data_loaded['calibration']['uvfile'])
@@ -85,10 +85,11 @@ def read_config(config="config/conf.yaml"):
     injection_params.append(data_loaded['injection']['mode_inj'])
 
     # corruption parameters
+    corruption_params.append(data_loaded['corruption']['do_corrupt'])
     corruption_params.append(data_loaded['corruption']['ant_not_used'])
     corruption_params.append(data_loaded['corruption']['corr_ant'])
     corruption_params.append(data_loaded['corruption']['corruption'])
-    corruption_params.append(data_loaded['corruption']['corruption_table'])
+    corruption_params.append(data_loaded['corruption']['corrupt_table'])
 
     return general_params, calibration_params, imaging_params, injection_params, corruption_params
 
@@ -746,7 +747,7 @@ def extractFIT(im_name, box_region, logFILE):
 ############################################################# Main code #########################################################################
 # ---------------------------------------------------------------------------------------------------------------------------------------------- #
 
-config_file = os.getcwd()+"/config/conf.yaml"
+config_file = "/home/davide/PHD/joanne_copy/config/conf.yaml"
 print(config_file)
 
 general_params, calibration_params, imaging_params, injection_params, corruption_params = read_config(config_file)
@@ -801,7 +802,7 @@ doCorrupt = bool(corruption_params[0])
 ant_not_used = corruption_params[1]
 corr_ant = corruption_params[2]
 corruption = corruption_params[3]
-corrupt_table = base_calib+corruption_params[4]
+corrupt_table = corruption_params[4]
 
 base_EXP = output_path+EXPERIMENT+"/"
 outputFIT_path = base_EXP+EXPERIMENT+"_FITlog.txt"
@@ -932,6 +933,7 @@ if(mystep in thesteps):
         print("## No LISTOBS path set. Creating it..")
         listobs_path = output_path+expcode+".listobs"
         listobs(vis=ms, listfile=listobs_path)
+        print("listobs_path: ", listobs_path)
     
     if outDIR_INJ is not None and os.path.exists(outDIR_INJ):
         print("## Splitting MS files in directory: ", outDIR_INJ)
