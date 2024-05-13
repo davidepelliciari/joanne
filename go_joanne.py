@@ -68,8 +68,7 @@ def read_config(config="config/conf.yaml"):
     imaging_params.append(data_loaded['imaging']['box_source'])
     imaging_params.append(data_loaded['imaging']['box_bkg'])
     imaging_params.append(data_loaded['imaging']['rms'])
-    imaging_params.append(data_logaded['imaging']['keep_single_ms'])
-
+    imaging_params.append(data_loaded['imaging']['keep_single_ms'])
 
     # injection parameters
     injection_params.append(data_loaded['injection']['nFRBs'])
@@ -649,25 +648,27 @@ def getAntennae(ANT_notUSED):
 ## getAntennae_toCorrupt
 def getAntennae_toCorrupt(corrFACT, corrANT, ANT_notUSED, doCorrupt, antID):
 
+    CORRANT, ant_toCorr = getANT(corrANT)
+
     if ((corrANT == ANT_notUSED and corrANT != ['All']) or corrANT == ['None']):
         doCorrupt = False
         mask = [0 for ii in range(0,len(antID))]
+        return mask, CORRANT, ant_toCorr, doCorrupt
+
     elif corrANT != ANT_notUSED:
         for cANT in corrANT:
             if cANT in ANT_notUSED:
                 corrANT.remove(cANT)
-        if len(corrANT) == 0:
+        if len(corrANT) == 0 or corrFACT == 0:
             doCorrupt = False
             mask = [0 for ii in range(0,len(antID))]
+            return mask, CORRANT, ant_toCorr, doCorrupt
+        if corrANT == ['All']:
+            mask = [1 for ii in range(0,len(antID))]
+            return mask, CORRANT, ant_toCorr, doCorrupt
         else:
             mask = [1 if ant in corrANT else 0 for ant in antID]
-    if corrANT == ['All']:
-        mask = [1 for ii in range(0,len(antID))]
-    if corrFACT == 0:
-        doCorrupt = False
-    CORRANT, ant_toCorr = getANT(corrANT)
-
-    return mask, CORRANT, ant_toCorr, doCorrupt
+            return mask, CORRANT, ant_toCorr, doCorrupt
 
 
 ###############################################################################################
@@ -791,7 +792,9 @@ bpasstab = base_calib+calibration_params[9]
 Kselftab = base_calib+calibration_params[10]
 pselftab = base_calib+calibration_params[11]
 apselftab = base_calib+calibration_params[12]
-antID = calibration_params[13]
+ants = calibration_params[13]
+antID = ants.split(',')
+
 
 # imaging parameters
 modeIM_single = imaging_params[0]
@@ -821,7 +824,7 @@ modeINJ = injection_params[12]
 doCorrupt = bool(corruption_params[0])
 ant_not_used = corruption_params[1]
 corr_ant = corruption_params[2]
-corruption = corruption_params[3]
+#corruption = corruption_params[3]
 corrupt_table = corruption_params[4]
 
 base_EXP = output_path+EXPERIMENT+"/"
@@ -841,10 +844,16 @@ if is_non_empty_directory(base_EXP) == False:
     os.system('mkdir '+base_EXP)
 
 
-if nsim is not None:
-    outDIR_INJ = base_EXP+str(nFRBs)+"FRB_"+deltaT+"_"+str_fl+"Jy_"+str(nsim)
+if 'nsim' in locals() or 'nsim' in globals():
+    if nsim is not None:
+        try:
+            outDIR_INJ = base_EXP + str(nFRBs) + "FRB_" + deltaT + "_" + str_fl + "Jy_" + str(nsim)
+        except TypeError:
+            outDIR_INJ = base_EXP + str(nFRBs) + "FRB_" + deltaT + "_" + str_fl + "Jy_"
+    else:
+        outDIR_INJ = base_EXP + str(nFRBs) + "FRB_" + deltaT + "_" + str_fl + "Jy_"
 else:
-    outDIR_INJ = base_EXP+str(nFRBs)+"FRB_"+deltaT+"_"+str_fl+"Jy_"
+    outDIR_INJ = base_EXP + str(nFRBs) + "FRB_" + deltaT + "_" + str_fl + "Jy_"
 
 ANT_notUSED = [ant_not_used]        ## specify which antenna has not been used for applycal
 
