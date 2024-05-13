@@ -75,11 +75,8 @@ corruption:
 ```
 
 It's important to set the paths under "general" and the "base_calib" path under "calibration," where the calibration tables should be located.
-The configuration file must reside in the "./config/conf.yaml" directory. You can change this modifying manually the main python script, just after
-
-```python
-if __name__ == "__main__":
-```
+The configuration file must reside in the "./config/conf.yaml" directory. You can change this by modifying manually the main python script at 
+row 750, just after the function definitions.
 
 ### Description of configuration file parameters
 
