@@ -24,10 +24,10 @@ A sample calibration script looks like this:
 
 ```python
 general:
-    base: /path/to/base_path/
     listobs_path: /path/to/listobs/.listobs
     file_ToAs: /path/to/timeofarrivals.dat
     EXPERIMENT: test1.1
+    output_path: /path/to/output_path/
 
 calibration:
     uvfile: /path/to/uvfits_file/.uvfits
@@ -133,7 +133,7 @@ The corruption will take place in the ```phi_0_c``` parameter of the mbd table.
 ## Dependencies
 
 ```python
-numpy, matplotlib, scipy, math, random, re, yaml, os, casatools, casavlbitools, datetime, 
+numpy, matplotlib, scipy, math, random, re, yaml 6.0.1>, os, casatools, casavlbitools, datetime
 ```
 
 For any questions regarding the pipeline please feel free to write to:
