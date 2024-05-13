@@ -68,6 +68,7 @@ def read_config(config="config/conf.yaml"):
     imaging_params.append(data_loaded['imaging']['box_source'])
     imaging_params.append(data_loaded['imaging']['box_bkg'])
     imaging_params.append(data_loaded['imaging']['rms'])
+    imaging_params.append(data_logaded['imaging']['keep_single_ms'])
 
 
     # injection parameters
@@ -799,6 +800,7 @@ imsize = imaging_params[2]
 box_source = imaging_params[3]
 box_bkg = imaging_params[4]
 rms = imaging_params[5]
+keep_ms = imaging_params[6]
 
 # injection parameters
 nFRBs = injection_params[0]
@@ -1068,7 +1070,7 @@ if(mystep in thesteps):
             os.system("rm -rf "+splitted_ms_names[ii])
     else:
         print("## Keeping single MS files..")
-        
+
 mystep = 5
 
 if(mystep in thesteps):
