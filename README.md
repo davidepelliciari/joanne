@@ -1,4 +1,4 @@
-# JOANNE: An injection pipeline of transient signals into real interferometric data
+# JOANNE: An injection pipeline for transient signals injection into interferometric data
 
 JOANNE,  inJection Of fAst traNsients iNto visibilitiEs, is a python-3 script which enables the injection of a given number of Fast Radio Bursts (FRBs) into radio interferometric visibility data.
 Additionally, if specific calibration tables are already present, it allows simulating systematic phase errors by corrupting the phases of one or more antennas,
