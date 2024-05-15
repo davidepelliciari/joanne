@@ -320,7 +320,7 @@ def modelPointSource(ms, flux, direction, freq, BW, cell, radir, decdir, im_name
 
     # add a continuum component at given direction, flux, freq. and with given "shape"
 
-    #cl.addcomponent(dir=direction, flux=flux, fluxunit='Jy', freq=freq, shape="Gaussian"), majoraxis="10.0mas", minoraxis='10.0mas', positionangle='0.0deg')
+    #cl.addcomponent(dir=direction, flux=flux, fluxunit='Jy', freq=freq, shape="Gaussian"), majoraxis="10.0mas", minoraxis='10.0mas', positionangle='0.0rad')
     cl.addcomponent(dir=direction, flux=flux, fluxunit='Jy', freq=freq, shape="point")
 
     # define your image. It has to be the same size of the real one (from tclean)
@@ -824,7 +824,7 @@ modeINJ = injection_params[12]
 doCorrupt = bool(corruption_params[0])
 ant_not_used = corruption_params[1]
 corr_ant = corruption_params[2]
-#corruption = corruption_params[3]
+corruption = corruption_params[3]           ## uncomment for simulations purpouse
 corrupt_table = corruption_params[4]
 
 base_EXP = output_path+EXPERIMENT+"/"
@@ -872,11 +872,11 @@ mask, CORRANT, ant_toCorr, doCorrupt = getAntennae_toCorrupt(corruption, corrANT
 if selANT:
     outDIR_INJ = outDIR_INJ+"_notUSED_"+ANT_notUSED_dir
     if doCorrupt:
-        outDIR_INJ = outDIR_INJ+"_notUSED_"+ANT_notUSED_dir+"_"+CORRANT+"_corrupted_"+str(corruption)+"deg/"
+        outDIR_INJ = outDIR_INJ+"_notUSED_"+ANT_notUSED_dir+"_"+CORRANT+"_corrupted_"+str(corruption)+"rad/"
     else:
         outDIR_INJ = outDIR_INJ+"/"
 elif doCorrupt:
-    outDIR_INJ = outDIR_INJ+"_"+CORRANT+"_corrupted_"+str(corruption)+"deg/"
+    outDIR_INJ = outDIR_INJ+"_"+CORRANT+"_corrupted_"+str(corruption)+"rad/"
 else:
     outDIR_INJ = outDIR_INJ+"/"
 
@@ -1051,9 +1051,9 @@ if(mystep in thesteps):
         # if no corruption has to be applied then you want only to inject the point source into CORRECTED_DATA column
         if doCorrupt:
 
-            imout = outDIR_INJ+"injectedFRB_"+str_fl+"Jy_"+CORRANT+"_"+str(corruption)+'deg'     # final DIRTY image name
+            imout = outDIR_INJ+"injectedFRB_"+str_fl+"Jy_"+CORRANT+"_"+str(corruption)+'rad'     # final DIRTY image name
 
-            print("## Corrupting visibilities.. corruption: ", corruption, " deg")
+            print("## Corrupting visibilities.. corruption: ", corruption, " rad")
             corruptVIS(outms, corruption, thetable, corr_table, antID, mask, base_calib)
             #getIMAGE(outms, antennae, imout, modeIM_single, imsize)      ## get the DIRTY image of your injected-corrupted visibilities
             print("## Done!")
