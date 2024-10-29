@@ -69,7 +69,7 @@ injection:
     mode_inj: uniform
 
 corruption:
-    ant_not_used: All
+    ant_not_used: None
     corr_ant: O8
     corruption: 1.0
     corrupt_table: mbd
