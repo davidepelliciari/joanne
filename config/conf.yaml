@@ -1,14 +1,14 @@
 general:
   listobs_path: null
-  file_ToAs: null
-  EXPERIMENT: TEST
-  output_path: /home/davide/PHD/joanne_copy/mytest/
+  file_ToAs: /home/davide/PHD/joanne/mytest/TEST_M5_all/5FRB_5h48m_eq0.01Jy_/newTOAs.dat
+  EXPERIMENT: NEWTEST
+  output_path: /home/davide/PHD/joanne/mytest/
 
 calibration:
-  uvfile: /home/davide/PHD/joanne_copy/mytest/ek051e.uvfits
-  ms: /home/davide/PHD/joanne_copy/mytest/ek051e.ms
-  base_calib: /home/davide/PHD/joanne_copy/mytest/
-  targetFLAG: /home/davide/PHD/joanne_copy/mytest/FLAGtarget.flagcmd
+  uvfile: /home/davide/PHD/joanne/mytest/ek051e.uvfits
+  ms: /home/davide/PHD/joanne/mytest/ek051e.ms
+  base_calib: /home/davide/PHD/joanne/mytest/
+  targetFLAG: /home/davide/PHD/joanne/mytest/FLAGtarget.flagcmd
   bp_cal: J1829+4844
   ph_cal: J0529+3209
   target: R1_D
@@ -22,31 +22,33 @@ calibration:
 
 imaging:
   modeIM_single: DIRTY
-  modeIM_concat: CLEAN
   imsize: 1280
-  box_region: 626,626,654,654
-  box_bkg: 54,68,1188,565
-  rms: 2.e-4
-  keep_single_ms: False
+  box_source: 626,626,654,654
+  box_bkg: 64,34,1231,565
+  keep_single_ms: True
 
 injection:
-  nFRBs: 15
-  fl_ch: 0.01
+  nFRBs: 5
+  fl_ch: 0.005
   fl_std: 0.025
   alpha_fl: -2
   modeFL: equal
   freq: 1.4GHz
   BW: 0.256GHz
   direction: J2000 05h31m58.700s +33d08m52.568s
-  cell: 3.6mas
+  cell: 3.0mas
   t_start_inj: 2022/09/22/00:00:00
   t_stop_inj: 2022/09/22/05:48:39
   fld_inj: R1_D
-  mode_inj: uniform
+  mode_inj: from_file
 
 corruption:
   do_corrupt: False
   ant_not_used: None
-  corr_ant: O8
-  corruption: 1.0
+  corr_ant: All
+  corruption: 50
   corrupt_table: ek051e_All.mbd
+  corr_mode: external
+  corr_min: 0
+  corr_max: 150
+  corr_parameter: phase
