@@ -6,7 +6,6 @@ import os
 import os.path
 from casatools import table
 from scipy.constants import c
-from casavlbitools import fitsidi
 import matplotlib.pyplot as plt
 from casatools import image
 import math
@@ -63,11 +62,9 @@ def read_config(config="config/conf.yaml"):
 
     # imaging parameters
     imaging_params.append(data_loaded['imaging']['modeIM_single'])
-    imaging_params.append(data_loaded['imaging']['modeIM_concat'])
     imaging_params.append(data_loaded['imaging']['imsize'])
     imaging_params.append(data_loaded['imaging']['box_source'])
     imaging_params.append(data_loaded['imaging']['box_bkg'])
-    imaging_params.append(data_loaded['imaging']['rms'])
     imaging_params.append(data_loaded['imaging']['keep_single_ms'])
 
     # injection parameters
@@ -91,6 +88,10 @@ def read_config(config="config/conf.yaml"):
     corruption_params.append(data_loaded['corruption']['corr_ant'])
     corruption_params.append(data_loaded['corruption']['corruption'])
     corruption_params.append(data_loaded['corruption']['corrupt_table'])
+    corruption_params.append(data_loaded['corruption']['corr_mode'])
+    corruption_params.append(data_loaded['corruption']['corr_min'])
+    corruption_params.append(data_loaded['corruption']['corr_max'])
+    corruption_params.append(data_loaded['corruption']['corr_parameter'])
 
     return general_params, calibration_params, imaging_params, injection_params, corruption_params
 
@@ -115,16 +116,18 @@ def inject_phase_offset(arr, ant, sigma, antID):
 
     if ant != "All" and ant != "None":
 
-        id_ant = antID.index(ant)
-        sig = sigma[id_ant]
-        array_ant = newarr[id_ant::N_ant]
+        for a in ant:
 
-        #noisy_array = [array_ant[i]+sig for i in range(0,len(array_ant))]
-        noisy_array = [sig for i in range(0,len(array_ant))]
+            id_ant = antID.index(a)
+            sig = sigma[id_ant]
+            array_ant = newarr[id_ant::N_ant]
 
-        #noisy_array = array_ant + np.random.normal(0, sig, len(array_ant))   #inject gaussian noise
+            #noisy_array = [array_ant[i]+sig for i in range(0,len(array_ant))]
+            noisy_array = [sig for i in range(0,len(array_ant))]
 
-        newarr[id_ant::N_ant] = noisy_array
+            #noisy_array = array_ant + np.random.normal(0, sig, len(array_ant))   #inject gaussian noise
+
+            newarr[id_ant::N_ant] = noisy_array
 
     elif ant == "All":
 
@@ -159,6 +162,11 @@ def inject_phase_offset(arr, ant, sigma, antID):
 ## plot_tab: plot calibration table after corruption
 def plot_tab(phi, N_ant, antID):
 
+    #print("phi che viene plottata: ")
+    #print(phi)
+
+    outfile = open("/home/davide/PHD/joanne/mytest/delay_test_distributions.dat", 'w')
+
     plt.figure(figsize=(12,8))
 
     for j in range(0,N_ant):
@@ -167,12 +175,15 @@ def plot_tab(phi, N_ant, antID):
     
         time = np.linspace(0,len(phiNc), len(phiNc))
 
+        print("antID: ", antID[j], " media phiNC: ", np.mean(phiNc), " standard-dev: ", np.std(phiNc))
+        outfile.write(str(antID[j])+" "+str(np.mean(phiNc))+" "+str(np.std(phiNc))+"\n")
         plt.plot(time, phiNc, marker='.', ls='--', markersize=10,label=antID[j])#, color=cl)
 
-    plt.ylim(-60,60)
+
+    #plt.ylim(-np.pi,np.pi)
     plt.xlabel("Scan number", fontsize=23)
     plt.ylabel(r"$\phi_{0,i}$", fontsize=23)
-    plt.text(0,45,'LL', fontsize=30)
+    #plt.text(0,45,'LL', fontsize=30)
     plt.legend(ncol=3, fontsize=16)
     plt.show()
 
@@ -180,14 +191,27 @@ def plot_tab(phi, N_ant, antID):
 ###############################################################################################
 
 
-# corruptVIS: corrupt a given calibration table (e.g. multi-band delay) and apply it to corrected visibilities
-def corruptVIS(ms, corrFACT, origtable, corr_table, antID, mask, base_calib):
+## corruptVIS: corrupt a given calibration table (e.g. multi-band delay) and apply it to corrected visibilities
+## mode: manual = choose manually the corruption factor by passing a "corruption" parameter in input
+## mode: external = corrFACT is an array with all the corruptions.
+## mode: TimeDep = as external, but the corrFACT array changes for each injection
+def corruptVIS(ms, corrFACT, origtable, corr_table, corr_parameter, antID, mask, base_calib, mode='manual'):
 
+    print("### corrupting visibilities!")
     new_corrected = []
     correct_data = []
     corr_bkg = []
 
     tb.open(ms, nomodify=False)     ######### open the MS with DATA - CORR. DATA - MODEL_DATA
+
+    index_parameters_L = [0,1,2]
+    index_parameters_R = [4,5,6]
+
+    mapping = {"phase": 0, "delay": 1, "rate": 2}
+    index = mapping.get(corr_parameter, 0)
+
+    idx_L = index_parameters_L[index]
+    idx_R = index_parameters_R[index]
 
     data_column = tb.getcol('DATA')
     corr_bkg = tb.getcol('CORRECTED_DATA')
@@ -199,9 +223,15 @@ def corruptVIS(ms, corrFACT, origtable, corr_table, antID, mask, base_calib):
 
     tb.close()
 
-    str_corrFACT = "_"+str(corrFACT)
+    if mode == 'manual':
+        str_corrFACT = "_"+str(corrFACT)
+        if corrFACT == 0.:
+            str_corrFACT = ""
+    elif mode == 'external' or mode == 'TimeDep':
+        str_corrFACT = "_"+str(np.mean(corrFACT))
+
     N_ant = len(antID)
-    antUSED = next((antID[i] for i, m in enumerate(mask) if m == 1), None)
+    antUSED = [antID[i] for i, m in enumerate(mask) if m == 1]
 
     allANT = all(ants == 1 for ants in mask[1:])
     noANTS = all(ants == 0 for ants in mask)
@@ -211,33 +241,44 @@ def corruptVIS(ms, corrFACT, origtable, corr_table, antID, mask, base_calib):
         print("## Considering all antennas", allANT)
         antUSED = "All"
         str_corrFACT = 'All'
+        #mask[0] = 0                ## UNCOMMENT THIS TO HAVE NULL EF CORRUPTIONS
 
     if noANTS:
 
         print("## No corruption applied", noANTS)
         antUSED = "None"
 
-    if corrFACT == 0.:
-        str_corrFACT = ""
-
+    print("### copying ", origtable, " into ", corr_table)
     os.system('cp -r '+origtable+" "+corr_table)
-    tb.open(corr_table, nomodify=False)
+    print("### done with the copy")
+
+    #tb.open(corr_table, nomodify=False)
+    tb.open(origtable, nomodify=False)
     fpar = tb.getcol('FPARAM')
 
-    phi0c_L = fpar[0,0,:]
-    phi0c_R = fpar[4,0,:]
-    
-    sigma = [float(corrFACT)*mask[ii] for ii in range(0,len(mask))]
+    phi0c_L = fpar[idx_L,0,:]
+    phi0c_R = fpar[idx_R,0,:]
+
+    #plot_tab(phi0c_L, N_ant, antID)
+
+
+    if mode == 'manual':
+        sigma = [float(corrFACT)*mask[ii] for ii in range(0,len(mask))]
+    elif mode == 'external' or mode == 'TimeDep':
+        sigma = [float(corrFACT[ii])*mask[ii] for ii in range(0,len(mask))]
     sigmaR = sigma
+
+    print("### creating phi_noise, considering ", sigma)
     
+    #print("ANTENNA DA USARE PER LA CORRUZIONE: ", antUSED)
     phi_noise = inject_phase_offset(phi0c_L, antUSED, sigma, antID)
     phi_noiseR = inject_phase_offset(phi0c_R, antUSED, sigmaR, antID)
     
     #plot_tab(phi_noise, N_ant, antID)
 
     newfpar = np.zeros_like(fpar)
-    newfpar[0,0,:] = phi_noise
-    newfpar[4,0,:] = phi_noiseR
+    newfpar[idx_L,0,:] = phi_noise
+    newfpar[idx_R,0,:] = phi_noiseR
 
     tb.putcol("FPARAM", newfpar)    # sostituisco la colonna 'FPARAM' con la nuova appena calcolata                                                                                                         
     tb.flush()   # flush the current content to disk
@@ -254,7 +295,7 @@ def corruptVIS(ms, corrFACT, origtable, corr_table, antID, mask, base_calib):
     tb.open(ms, nomodify=False)
     correct_data = tb.getcol('CORRECTED_DATA')
     new_corrected = correct_data + corr_bkg
-    data_column = tb.getcol('DATA')
+
     tb.putcol('CORRECTED_DATA', new_corrected)
     tb.putcol('DATA', data_column)
     tb.flush()
@@ -271,11 +312,12 @@ def getIMAGE(ms, antennae, imout, mode, imsize=1280, rms=None):
         print("## Making a dirty image")
         nitter = 0
         inter = False
+        thresh = None
     else:
         print("## Making a cleaned image")
         nitter = 1000
         inter = False
-        thresh = "{:.2f}".format(rms/1000.)
+        thresh = "{:.2f}".format(rms*1000.)
         thresh = thresh+'mJy'
 
     print("## Eliminating imout: ", imout)
@@ -402,6 +444,7 @@ def get_injected_times(dirTOA, scan_data, num_events, mode='uniform', t_start=No
    
     num_scans = len(scan_data)
     event_counts = np.zeros(num_scans, dtype=int)
+
     if t_start is not None:
         t_start = parse_datetime(t_start)
     if t_stop is not None:
@@ -418,10 +461,12 @@ def get_injected_times(dirTOA, scan_data, num_events, mode='uniform', t_start=No
     else:
         start_index = next(i for i, (start, stop) in enumerate(scan_data) if parse_datetime(start) >= t_start)
         end_index = next(i for i, (start, stop) in enumerate(scan_data) if parse_datetime(stop) >= t_stop)
+
     scan_data = scan_data[start_index:end_index]
     print("## Number of scans considered for the injection: ", len(scan_data))
     event_counts = np.zeros(len(scan_data), dtype=int)
     num_scans_in_range = len(scan_data)
+
     if num_events > 3:
         if mode == 'uniform':
             total_events = num_events
@@ -459,6 +504,7 @@ def get_injected_times(dirTOA, scan_data, num_events, mode='uniform', t_start=No
     else:
         mid_index = int(num_scans_in_range / 2)
         event_counts[mid_index] = 1
+
     print("## Number of instant point sources per scan: ")
     print(event_counts)
     sel_tstart = [sublist[0] for sublist in scan_data]
@@ -466,6 +512,7 @@ def get_injected_times(dirTOA, scan_data, num_events, mode='uniform', t_start=No
     sel_toas = []
     sel_scans = []
     output_file = open(dirTOA+"newTOAs.dat", 'w')
+
     for ii in range(0,len(scan_data)):
         toas_per_scan = get_ToAs_in_scan(sel_tstart[ii], sel_tstop[ii])
         num_events_per_scan = event_counts[ii]
@@ -474,6 +521,7 @@ def get_injected_times(dirTOA, scan_data, num_events, mode='uniform', t_start=No
             for index in selected_indices:
                 sel_toas.append(toas_per_scan[index])
                 output_file.write(str(toas_per_scan[index])+"\n")
+                
     print("## Number of time of arrivals: ", len(sel_toas))
     output_file.close()
 
@@ -505,9 +553,9 @@ def is_non_empty_directory(path):
     if os.path.isdir(path):
         contents = os.listdir(path)
         if contents:
-            return True  # La cartella esiste ed è non vuota
+            return True
 
-    return False  # La cartella non esiste o è vuota
+    return False
 
 
 
@@ -793,17 +841,15 @@ Kselftab = base_calib+calibration_params[10]
 pselftab = base_calib+calibration_params[11]
 apselftab = base_calib+calibration_params[12]
 ants = calibration_params[13]
-antID = ants.split(',')
+antID = ants.split(',')#
 
 
 # imaging parameters
 modeIM_single = imaging_params[0]
-modeIM_concat = imaging_params[1]
-imsize = imaging_params[2]
-box_source = imaging_params[3]
-box_bkg = imaging_params[4]
-rms = imaging_params[5]
-keep_ms = imaging_params[6]
+imsize = imaging_params[1]
+box_source = imaging_params[2]
+box_bkg = imaging_params[3]
+keep_ms = imaging_params[4]
 
 # injection parameters
 nFRBs = injection_params[0]
@@ -826,6 +872,10 @@ ant_not_used = corruption_params[1]
 corr_ant = corruption_params[2]
 corruption = corruption_params[3]           ## uncomment for simulations purpouse
 corrupt_table = corruption_params[4]
+mode_corr = corruption_params[5]
+corr_min = corruption_params[6]
+corr_max = corruption_params[7]
+corr_parameter = corruption_params[8]
 
 base_EXP = output_path+EXPERIMENT+"/"
 outputFIT_path = base_EXP+EXPERIMENT+"_FITlog.txt"
@@ -847,8 +897,8 @@ if is_non_empty_directory(base_EXP) == False:
 if 'nsim' in locals() or 'nsim' in globals():
     if nsim is not None:
         try:
-            outDIR_INJ = base_EXP + str(nFRBs) + "FRB_" + deltaT + "_" + str_fl + "Jy_" + str(nsim)
-        except TypeError:
+            outDIR_INJ = base_EXP + str(nFRBs) + "FRB_" + deltaT + "_" + str_fl + "Jy_" + str(nsim)+"_"
+        except TypeErrofr:
             outDIR_INJ = base_EXP + str(nFRBs) + "FRB_" + deltaT + "_" + str_fl + "Jy_"
     else:
         outDIR_INJ = base_EXP + str(nFRBs) + "FRB_" + deltaT + "_" + str_fl + "Jy_"
@@ -856,29 +906,56 @@ else:
     outDIR_INJ = base_EXP + str(nFRBs) + "FRB_" + deltaT + "_" + str_fl + "Jy_"
 
 ANT_notUSED = [ant_not_used]        ## specify which antenna has not been used for applycal
-
 selANT = False
 if ANT_notUSED != ['None']:
     selANT = True
 
-corrANT = [corr_ant]
+corrANT = [item.strip() for item in corr_ant.split(',')]
+
 
 print("## Not considering following antennas: ", ANT_notUSED)
 
 
 antennae, ANT_notUSED_dir, ant_notUSED = getAntennae(ANT_notUSED)
 mask, CORRANT, ant_toCorr, doCorrupt = getAntennae_toCorrupt(corruption, corrANT, ANT_notUSED, doCorrupt, antID)
+print("mask, CORRANT, ant_toCorr, doCorrupt: ")
+print(mask, CORRANT, ant_toCorr, doCorrupt)
 
 if selANT:
-    outDIR_INJ = outDIR_INJ+"_notUSED_"+ANT_notUSED_dir
-    if doCorrupt:
-        outDIR_INJ = outDIR_INJ+"_notUSED_"+ANT_notUSED_dir+"_"+CORRANT+"_corrupted_"+str(corruption)+"rad/"
+    outDIR_INJ = outDIR_INJ+"notUSED_"+ANT_notUSED_dir
+    if doCorrupt and mode_corr == 'manual':
+        outDIR_INJ = outDIR_INJ+ANT_notUSED_dir+"notUsed_c"+CORRANT+"_corrupted_"+str(corruption)+"rad/"
+    elif doCorrupt and mode_corr == 'external':
+        corr_min_rad = corr_min*1.
+        corr_max_rad = corr_max*1.
+        if corr_parameter == 'phase':
+            corr_min_rad = corr_min*0.0174533
+            corr_max_rad = corr_max*0.0174533
+        corruption = np.random.uniform(corr_min_rad, corr_max_rad, len(antID))
+        str_corrupt = "{:.4f}".format(np.mean(corruption))
+        outDIR_INJ = outDIR_INJ+ANT_notUSED_dir+"notUsed_c"+CORRANT+"_TimeIndep_"+str_corrupt+"rad/"
+    elif doCorrupt and mode_corr == 'TimeDep':
+        outDIR_INJ = outDIR_INJ+ANT_notUSED_dir+"notUsed_c"+CORRANT+"_TimeDep/"
     else:
         outDIR_INJ = outDIR_INJ+"/"
-elif doCorrupt:
-    outDIR_INJ = outDIR_INJ+"_"+CORRANT+"_corrupted_"+str(corruption)+"rad/"
+if doCorrupt and mode_corr == 'manual':
+    outDIR_INJ = outDIR_INJ+CORRANT+"_corrupted_"+str(corruption)+"rad/"
+elif doCorrupt and mode_corr == 'external':
+    corr_min_rad = corr_min*1.
+    corr_max_rad = corr_max*1.
+    if corr_parameter == 'phase':
+        corr_min_rad = corr_min*0.0174533
+        corr_max_rad = corr_max*0.0174533
+    corruption = np.random.uniform(corr_min_rad, corr_max_rad, len(antID))
+    str_corrupt = "{:.4f}".format(np.mean(corruption))
+    outDIR_INJ = outDIR_INJ+CORRANT+"_TimeIndep_"+str_corrupt+"rad/"
+elif doCorrupt and mode_corr == 'TimeDep':
+    outDIR_INJ = outDIR_INJ+CORRANT+"_TimeDep/"
 else:
     outDIR_INJ = outDIR_INJ+"/"
+
+
+print("final ANTENNAE: ", antennae)
 
 
 # --------------------------------------------------------------------------------------------------------
@@ -906,7 +983,7 @@ step_title = {0: 'Import UVFITS in a CASA measurement set (MS) (importuvfits) + 
                 2: 'Apply calibration tables to the splitted MSs (applycal) + Clean other RFIs in CORRECTED data (rflag)',
                 3: 'Create and inject a fake point source in splitted MSs',
                 4: 'Concatenate the splitted MS files in a single MS (concat)',
-                5: 'Get the dirty/cleaned image of the concatenate MS file (tclean)'
+                5: 'Get the dirty/cleaned image of the concatenated MS file (tclean)'
                 }
 
 thesteps = []
@@ -1037,6 +1114,9 @@ if(mystep in thesteps):
     print("## Fluxes will be: ")
     print(flux)
 
+    if mode_corr == 'external':
+        imout = outDIR_INJ+"injectedFRB_"+str_fl+"Jy_"+CORRANT+"_"+str(np.mean(corruption))+'rad_'+mode_corr     # final DIRTY image name
+
     for ii in range(0,len(splitted_ms_names)):
 
         fl = flux[ii]
@@ -1051,10 +1131,19 @@ if(mystep in thesteps):
         # if no corruption has to be applied then you want only to inject the point source into CORRECTED_DATA column
         if doCorrupt:
 
-            imout = outDIR_INJ+"injectedFRB_"+str_fl+"Jy_"+CORRANT+"_"+str(corruption)+'rad'     # final DIRTY image name
+            if mode_corr == 'TimeDep':
+                corr_min_rad = corr_min*1.
+                corr_max_rad = corr_max*1.
+                #corr_min_rad = corr_min*0.0174533
+                #corr_max_rad = corr_max*0.0174533
+                corruption = np.random.uniform(corr_min_rad, corr_max_rad, len(antID))
+                imout = outDIR_INJ+"injectedFRB_"+str_fl+"Jy_"+CORRANT+"_"+str(np.mean(corruption))+'rad_'+mode_corr     # final DIRTY image name
+
+            elif mode_corr == 'manual':
+                imout = outDIR_INJ+"injectedFRB_"+str_fl+"Jy_"+CORRANT+"_"+str(corruption)+'rad'     # final DIRTY image name
 
             print("## Corrupting visibilities.. corruption: ", corruption, " rad")
-            corruptVIS(outms, corruption, thetable, corr_table, antID, mask, base_calib)
+            corruptVIS(outms, corruption, thetable, corr_table, corr_parameter, antID, mask, base_calib, mode_corr)
             #getIMAGE(outms, antennae, imout, modeIM_single, imsize)      ## get the DIRTY image of your injected-corrupted visibilities
             print("## Done!")
 
@@ -1063,7 +1152,7 @@ if(mystep in thesteps):
             imout = outms[:-3]+"_"+modeIM_single
             default(uvsub)
             uvsub(vis=outms, reverse=True)
-            #getIMAGE(outms, antennae, imout, modeIM_single, imsize)
+            getIMAGE(outms, antennae, imout, modeIM_single, imsize)
 
 mystep = 4
 
@@ -1076,7 +1165,8 @@ if(mystep in thesteps):
     if keep_ms != True:
         print("## Removing single MS files..")
         for ii in range(0,len(splitted_ms_names)):
-            os.system("rm -rf "+splitted_ms_names[ii])
+            print("rm -rf "+splitted_ms_names[ii])
+            #os.system("rm -rf "+splitted_ms_names[ii])
     else:
         print("## Keeping single MS files..")
 
@@ -1085,17 +1175,23 @@ mystep = 5
 if(mystep in thesteps):
 
     print("## Ready for tclean..")
-    imout = outDIR_INJ+"CONCAT_"+str(nFRBs)+"FRB_"+deltaT+"_"+modeIM_concat
+    imout = outDIR_INJ+"CONCAT_"+str(nFRBs)+"FRB_"+deltaT+"_"
     fitlog_file = outDIR_INJ+"imfit_logger.log"
-    getIMAGE(concat_vis, antennae, imout, modeIM_concat, imsize, rms)      ## get the DIRTY image of your injected-corrupted visibilities
-    RAfit, decfit = extractFIT(imout+".image", box_source, fitlog_file)
+    getIMAGE(concat_vis, antennae, imout+'DIRTY', 'DIRTY', imsize)      ## get the DIRTY image of your injected-corrupted visibilities
+    peak = imstat(imagename=imout+"DIRTY.image", box=box_source)['max'][0]
+    peak_dirty = "{:.4f}".format(peak)
+    rms_used = peak/10.
+    rmsUsed_str = "{:.4f}".format(rms_used)
+    getIMAGE(concat_vis, antennae, imout+"CLEAN", "CLEAN", imsize, rms_used)      ## get the CLEANED image of your injected-corrupted visibilities
+    RAfit, decfit = extractFIT(imout+"CLEAN.image", box_source, fitlog_file)
     decfit_form = convert_dec(decfit)
-    rms_fromIm = imstat(imagename=imout+".image", box=box_bkg)['rms'][0]
+    peak_fromIm = imstat(imagename=imout+"CLEAN.image", box=box_source)['max'][0]
+    peakstr_fromIm = "{:.4f}".format(peak_fromIm)
+    rms_fromIm = imstat(imagename=imout+"CLEAN.image", box=box_bkg)['rms'][0]
     rms_str = "{:.4f}".format(rms_fromIm)
-    peak = imstat(imagename=imout+".image", box=box_source)['max'][0]
-    peak_str = "{:.4f}".format(peak)
-    snr = "{:.3f}".format(peak/rms_fromIm)
     print("## Writing fit to file: ", outputFIT_path)
     outFITfile = open(outputFIT_path, 'a')
-    outFITfile.write(str(nFRBs)+" "+deltaT+" "+peak_str+" "+rms_str+" "+snr+" "+RAfit+" "+decfit_form+"\n")
+    outFITfile.write(str(nFRBs)+" "+deltaT+" "+peak_dirty+" "+peakstr_fromIm+" "+rmsUsed_str+" "+rms_str+" "+RAfit+" "+decfit_form+"\n")
     outFITfile.close()
+    print('rm -rf '+base_EXP+str(nFRBs)+"*")
+    #os.system('rm -rf '+base_EXP+str(nFRBs)+"*")
